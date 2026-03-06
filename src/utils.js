@@ -1,6 +1,6 @@
 // F1 Fantasy League — Scoring Engine
 
-import { DRIVERS, FANTASY_TEAMS, CONSTRUCTORS, SCORING, RESULTS } from './data';
+import { DRIVERS, FANTASY_TEAMS, CONSTRUCTORS, SCORING, RESULTS, CALENDAR } from './data';
 
 /**
  * Get constructor pairs for a fantasy team

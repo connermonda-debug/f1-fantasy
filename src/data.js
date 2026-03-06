@@ -110,23 +110,7 @@ export const CALENDAR = [
 ];
 
 // === RACE RESULTS ===
-// After each race weekend, results are added here.
-// qualifying/race: arrays of driver keys ordered P1 to P20 (index 0 = P1)
-// sprint: same format but only top 8 score points
-// fastestLap: driver key who set fastest lap
-// driverOfTheDay: driver key voted DOTD
-// dnfs: array of driver keys who did not finish
-// fastestPitStop: constructor key with fastest pit stop
-export const RESULTS = [
-  // After each race, add an entry here. Example:
-  // {
-  //   round: 1,
-  //   qualifying: ['verstappen', 'norris', 'leclerc', ...],  // P1 to P20
-  //   race:       ['norris', 'verstappen', 'leclerc', ...],  // P1 to P20
-  //   sprint: null,  // or ['verstappen', 'norris', ...] for sprint weekends
-  //   fastestLap: 'norris',
-  //   driverOfTheDay: 'hamilton',
-  //   dnfs: [],
-  //   fastestPitStop: 'mclaren',
-  // },
-];
+// Auto-updated by scripts/fetch-results.mjs via GitHub Actions.
+// Do not edit manually — changes will be overwritten.
+import RESULTS_DATA from './results.json';
+export const RESULTS = RESULTS_DATA;
