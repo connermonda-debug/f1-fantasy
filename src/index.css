@@ -284,6 +284,48 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* Delta Indicators */
+.standings-delta {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.standings-delta.positive {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+}
+
+.standings-delta.negative {
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+}
+
+.standings-delta.neutral {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+}
+
+.delta-arrow {
+  font-size: 0.55rem;
+  line-height: 1;
+}
+
+/* Last Updated Badge */
+.header-updated {
+  font-size: 0.65rem !important;
+  opacity: 0.7;
 }
 
 .standings-bar-container {

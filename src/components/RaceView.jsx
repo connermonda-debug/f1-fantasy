@@ -66,8 +66,8 @@ export default function RaceView({ standings }) {
         </div>
       )}
 
-      {/* Bonuses Row */}
-      {race && (
+      {/* Bonuses Row — only show when race/sprint data exists */}
+      {race && (race.race || race.sprint || race.fastestLap || race.driverOfTheDay || race.fastestPitStop || (race.dnfs && race.dnfs.length > 0)) && (
         <div className="race-bonuses" style={{ marginBottom: 'var(--space-xl)' }}>
           <div className="bonus-grid">
             <div className="bonus-item">

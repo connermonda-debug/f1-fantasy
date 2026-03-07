@@ -45,6 +45,9 @@ export default function App() {
                 {RESULTS.length}/{CALENDAR.length} Races
               </span>
             )}
+            <span className="header-season header-updated" title={`Built: ${__BUILD_TIME__}`}>
+              Updated {formatUpdatedTime(__BUILD_TIME__)}
+            </span>
           </div>
           <nav className="nav">
             {TABS.map(tab => (
@@ -64,4 +67,18 @@ export default function App() {
       </main>
     </>
   )
+}
+
+function formatUpdatedTime(isoString) {
+  if (!isoString) return ''
+  const d = new Date(isoString)
+  const now = new Date()
+  const diffMs = now - d
+  const diffHrs = Math.floor(diffMs / (1000 * 60 * 60))
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+  if (diffHrs < 1) return 'just now'
+  if (diffHrs < 24) return `${diffHrs}h ago`
+  if (diffDays < 7) return `${diffDays}d ago`
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }

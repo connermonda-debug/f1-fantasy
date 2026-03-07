@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <rect width="192" height="192" rx="32" fill="#15151E"/>
+  <rect y="0" width="192" height="6" fill="#E10600"/>
+  <text x="96" y="88" text-anchor="middle" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="52" fill="#E10600">F1</text>
+  <text x="96" y="130" text-anchor="middle" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="700" font-size="22" fill="#FFFFFF" letter-spacing="2">FANTASY</text>
+  <text x="96" y="158" text-anchor="middle" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="600" font-size="14" fill="#6B7280" letter-spacing="3">2026</text>
+</svg>

@@ -28,24 +28,46 @@ export default function Standings({ standings }) {
 
       {/* Hero Cards */}
       <div className="standings-hero">
-        {standings.map((team) => (
-          <div
-            key={team.key}
-            className="standings-card"
-            style={{ '--card-color': team.color }}
-          >
-            <div className="standings-position">{team.position}</div>
-            <div className="standings-name">{team.name}</div>
-            <div className="standings-points">{team.totalPoints}</div>
-            <div className="standings-points-label">Points</div>
-            <div className="standings-bar-container">
-              <div
-                className="standings-bar"
-                style={{ width: `${(team.totalPoints / maxPoints) * 100}%` }}
-              />
+        {standings.map((team) => {
+          const lastRace = team.raceHistory?.length > 0
+            ? team.raceHistory[team.raceHistory.length - 1]
+            : null
+          const delta = lastRace?.points || 0
+
+          return (
+            <div
+              key={team.key}
+              className="standings-card"
+              style={{ '--card-color': team.color }}
+            >
+              <div className="standings-position">{team.position}</div>
+              <div className="standings-name">{team.name}</div>
+              <div className="standings-points">{team.totalPoints}</div>
+              <div className="standings-points-label">
+                Points
+                {delta > 0 && (
+                  <span className="standings-delta positive">
+                    <span className="delta-arrow">&#9650;</span>+{delta}
+                  </span>
+                )}
+                {delta < 0 && (
+                  <span className="standings-delta negative">
+                    <span className="delta-arrow">&#9660;</span>{delta}
+                  </span>
+                )}
+                {delta === 0 && lastRace && (
+                  <span className="standings-delta neutral">&#8212; 0</span>
+                )}
+              </div>
+              <div className="standings-bar-container">
+                <div
+                  className="standings-bar"
+                  style={{ width: `${(team.totalPoints / maxPoints) * 100}%` }}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Race-by-Race Table */}

@@ -22,7 +22,7 @@ export const DRIVERS = {
   hamilton:    { name: 'Lewis Hamilton',       short: 'HAM', number: 44, constructor: 'ferrari' },
   leclerc:     { name: 'Charles Leclerc',      short: 'LEC', number: 16, constructor: 'ferrari' },
   verstappen:  { name: 'Max Verstappen',       short: 'VER', number: 1,  constructor: 'redbull' },
-  hadjar:      { name: 'Isack Hadjar',         short: 'HAD', number: 20, constructor: 'redbull' },
+  hadjar:      { name: 'Isack Hadjar',         short: 'HAD', number: 6,  constructor: 'redbull' },
   russell:     { name: 'George Russell',       short: 'RUS', number: 63, constructor: 'mercedes' },
   antonelli:   { name: 'Kimi Antonelli',       short: 'ANT', number: 12, constructor: 'mercedes' },
   alonso:      { name: 'Fernando Alonso',      short: 'ALO', number: 14, constructor: 'astonmartin' },
