@@ -194,10 +194,10 @@ function findFastestPitStop(pitStopData, raceResults) {
 async function main() {
   console.log(`Fetching ${SEASON} F1 results...`);
 
-  // 1. Fetch all qualifying results for the season
+  // 1. Fetch all qualifying results for the season (fallback for grid positions)
   const qualData = await fetchJSON(`${API_BASE}/${SEASON}/qualifying.json?limit=1000`);
   const qualRaces = qualData?.MRData?.RaceTable?.Races || [];
-  console.log(`  Qualifying: ${qualRaces.length} rounds`);
+  console.log(`  Qualifying sessions: ${qualRaces.length} rounds`);
 
   // 2. Fetch all race results for the season
   const raceData = await fetchJSON(`${API_BASE}/${SEASON}/results.json?limit=1000`);
@@ -239,11 +239,20 @@ async function main() {
 
     const result = { round };
 
-    // Qualifying order (P1 → P20)
-    if (qual?.QualifyingResults) {
+    // Starting grid order (P1 → P20)
+    // Primary: use grid positions from race results (authoritative — includes penalties)
+    // Fallback: qualifying session order (preliminary, before penalties are applied)
+    if (race?.Results) {
+      result.qualifying = race.Results
+        .filter(r => parseInt(r.grid) > 0) // exclude pit lane starts (grid=0)
+        .sort((a, b) => parseInt(a.grid) - parseInt(b.grid))
+        .map(r => mapDriver(r.Driver.driverId));
+      console.log(`  R${round} grid: from race results (${result.qualifying.length} drivers, post-penalties)`);
+    } else if (qual?.QualifyingResults) {
       result.qualifying = qual.QualifyingResults
         .sort((a, b) => parseInt(a.position) - parseInt(b.position))
         .map(r => mapDriver(r.Driver.driverId));
+      console.log(`  R${round} grid: from qualifying session (${result.qualifying.length} drivers, pre-penalties)`);
     }
 
     // Race finishing order (classified finishers only)
