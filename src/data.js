@@ -11,8 +11,8 @@ export const CONSTRUCTORS = {
   alpine:      { name: 'Alpine',         color: '#FF87BC', drivers: ['gasly', 'colapinto'] },
   haas:        { name: 'Haas',           color: '#B6BABD', drivers: ['ocon', 'bearman'] },
   rb:          { name: 'Racing Bulls',   color: '#6692FF', drivers: ['lawson', 'lindblad'] },
-  sauber:      { name: 'Sauber',         color: '#52E252', drivers: ['hulkenberg', 'bortoletto'] },
-  cadillac:    { name: 'Cadillac',       color: '#C0C0C0', drivers: ['bottas'] },
+  sauber:      { name: 'Audi',            color: '#52E252', drivers: ['hulkenberg', 'bortoletto'] },
+  cadillac:    { name: 'Cadillac',       color: '#C0C0C0', drivers: ['bottas', 'perez'] },
 };
 
 // === DRIVERS ===
@@ -38,6 +38,7 @@ export const DRIVERS = {
   hulkenberg:  { name: 'Nico Hulkenberg',      short: 'HUL', number: 27, constructor: 'sauber' },
   bortoletto:  { name: 'Gabriel Bortoletto',   short: 'BOR', number: 5,  constructor: 'sauber' },
   bottas:      { name: 'Valtteri Bottas',      short: 'BOT', number: 77, constructor: 'cadillac' },
+  perez:       { name: 'Sergio Perez',         short: 'PER', number: 11, constructor: 'cadillac' },
 };
 
 // === FANTASY TEAMS ===
@@ -83,7 +84,7 @@ export const SCORING = {
 
 // === 2026 RACE CALENDAR ===
 export const CALENDAR = [
-  { round: 1,  name: 'Australian Grand Prix',      location: 'Melbourne',     circuit: 'Albert Park',              date: '2026-03-15', sprint: false },
+  { round: 1,  name: 'Australian Grand Prix',      location: 'Melbourne',     circuit: 'Albert Park',              date: '2026-03-08', sprint: false },
   { round: 2,  name: 'Chinese Grand Prix',          location: 'Shanghai',      circuit: 'Shanghai International',   date: '2026-03-22', sprint: true },
   { round: 3,  name: 'Japanese Grand Prix',          location: 'Suzuka',        circuit: 'Suzuka Circuit',           date: '2026-04-05', sprint: false },
   { round: 4,  name: 'Bahrain Grand Prix',           location: 'Sakhir',        circuit: 'Bahrain International',    date: '2026-04-12', sprint: false },

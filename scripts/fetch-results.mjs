@@ -31,10 +31,13 @@ const DRIVER_MAP = {
   bearman: 'bearman',
   lawson: 'lawson',
   lindblad: 'lindblad',
+  arvid_lindblad: 'lindblad',
   hulkenberg: 'hulkenberg',
   bortoletto: 'bortoletto',
   bottas: 'bottas',
   hadjar: 'hadjar',
+  perez: 'perez',
+  sergio_perez: 'perez',
 };
 
 // ── Constructor ID mapping: Ergast constructorId → local key ──
@@ -53,6 +56,7 @@ const CONSTRUCTOR_MAP = {
   sauber: 'sauber',
   kick_sauber: 'sauber',
   stake: 'sauber',
+  audi: 'sauber',
   cadillac: 'cadillac',
   general_motors: 'cadillac',
   gm: 'cadillac',
@@ -85,6 +89,8 @@ const DRIVER_NAME_MAP = {
   'Gabriel Bortoleto': 'bortoletto',
   'Valtteri Bottas': 'bottas',
   'Isack Hadjar': 'hadjar',
+  'Sergio Perez': 'perez',
+  'Sergio Pérez': 'perez',
 };
 
 // ── Helpers ──
