@@ -13,6 +13,8 @@ const CARD_HEIGHT = 1080
  * @returns {Promise<Blob>} PNG image blob
  */
 export async function generateShareCard(round, teamResults) {
+  if (!teamResults) return null
+
   const canvas = document.createElement('canvas')
   canvas.width = CARD_WIDTH
   canvas.height = CARD_HEIGHT
@@ -56,7 +58,7 @@ export async function generateShareCard(round, teamResults) {
     .sort(([, a], [, b]) => b.totalPoints - a.totalPoints)
 
   const cardTop = 190
-  const cardHeight = 200
+  const cardHeight = 192
   const cardGap = 16
   const cardMargin = 36
 
@@ -175,6 +177,8 @@ export async function generateShareCard(round, teamResults) {
  */
 export async function shareRaceCard(round, teamResults) {
   const blob = await generateShareCard(round, teamResults)
+  if (!blob) return
+
   const cal = CALENDAR.find(c => c.round === round)
   const filename = `f1-fantasy-r${round}-${cal?.location?.toLowerCase().replace(/\s+/g, '-') || 'race'}.png`
 

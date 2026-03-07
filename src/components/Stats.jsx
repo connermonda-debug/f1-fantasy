@@ -7,6 +7,16 @@ import SeasonChart from './SeasonChart'
 export default function Stats({ standings }) {
   const stats = useMemo(() => computeStats(standings), [standings])
 
+  // Memoize race recaps — getRaceDetails + generateRecap for every round
+  const recaps = useMemo(() => {
+    return [...RESULTS].reverse().map(race => {
+      const cal = CALENDAR.find(c => c.round === race.round)
+      const details = getRaceDetails(race.round)
+      const recap = generateRecap(race, details?.teamResults, cal, standings)
+      return { round: race.round, name: cal?.name || `Race ${race.round}`, recap }
+    })
+  }, [standings])
+
   if (RESULTS.length === 0) {
     return (
       <div className="animate-in">
@@ -106,20 +116,15 @@ export default function Stats({ standings }) {
       <div className="stats-section">
         <h2 className="stats-section-title">Race Recaps</h2>
         <div className="recap-list">
-          {[...RESULTS].reverse().map(race => {
-            const cal = CALENDAR.find(c => c.round === race.round)
-            const details = getRaceDetails(race.round)
-            const recap = generateRecap(race, details?.teamResults, cal, standings)
-            return (
-              <div key={race.round} className="recap-card">
-                <div className="recap-header">
-                  <span className="recap-round">R{race.round}</span>
-                  <span className="recap-race-name">{cal?.name || `Race ${race.round}`}</span>
-                </div>
-                <p className="recap-text">{recap}</p>
+          {recaps.map(r => (
+            <div key={r.round} className="recap-card">
+              <div className="recap-header">
+                <span className="recap-round">R{r.round}</span>
+                <span className="recap-race-name">{r.name}</span>
               </div>
-            )
-          })}
+              <p className="recap-text">{r.recap}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>

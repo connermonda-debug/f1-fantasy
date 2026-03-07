@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { RESULTS, CALENDAR } from './data'
 import { calculateStandings } from './utils'
 import Standings from './components/Standings'
@@ -35,19 +35,20 @@ export default function App() {
     }
   }, [])
 
-  const dismissToast = () => {
+  const dismissToast = useCallback(() => {
     setShowToast(false)
-    if (newRound) {
-      localStorage.setItem('f1fantasy_lastSeenRound', String(newRound))
-    }
-  }
+    setNewRound(prev => {
+      if (prev) localStorage.setItem('f1fantasy_lastSeenRound', String(prev))
+      return null
+    })
+  }, [])
 
   // Auto-dismiss toast after 8 seconds
   useEffect(() => {
     if (!showToast) return
     const timer = setTimeout(dismissToast, 8000)
     return () => clearTimeout(timer)
-  }, [showToast])
+  }, [showToast, dismissToast])
 
   const renderView = () => {
     switch (activeTab) {
@@ -102,7 +103,7 @@ export default function App() {
             <span className="toast-text">
               New results! Round {newRound} — {CALENDAR.find(c => c.round === newRound)?.name || `Race ${newRound}`} is in.
             </span>
-            <button className="toast-dismiss" onClick={dismissToast}>✕</button>
+            <button className="toast-dismiss" onClick={(e) => { e.stopPropagation(); dismissToast() }}>✕</button>
           </div>
         </div>
       )}

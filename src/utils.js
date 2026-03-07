@@ -1,6 +1,6 @@
 // F1 Fantasy League — Scoring Engine
 
-import { DRIVERS, FANTASY_TEAMS, CONSTRUCTORS, SCORING, RESULTS, CALENDAR } from './data';
+import { DRIVERS, FANTASY_TEAMS, CONSTRUCTORS, SCORING, RESULTS } from './data';
 
 /**
  * Get constructor pairs for a fantasy team
@@ -169,54 +169,5 @@ export function getRaceDetails(round) {
   return { race, teamResults };
 }
 
-/**
- * Format position with suffix (1st, 2nd, 3rd, etc.)
- */
-export function formatPosition(pos) {
-  if (!pos) return '—';
-  const suffixes = { 1: 'st', 2: 'nd', 3: 'rd' };
-  const suffix = suffixes[pos] || 'th';
-  return `P${pos}`;
-}
 
-/**
- * Get the race calendar entry for a round
- */
-export function getCalendarRace(round) {
-  return CALENDAR.find(r => r.round === round);
-}
 
-/**
- * Check if a race has been completed (has results)
- */
-export function isRaceCompleted(round) {
-  return RESULTS.some(r => r.round === round);
-}
-
-/**
- * Get season stats
- */
-export function getSeasonStats() {
-  const standings = calculateStandings();
-  const completedRaces = RESULTS.length;
-
-  let bestSingleRace = { team: '', points: 0, round: 0 };
-  let mostDNFs = { team: '', count: 0 };
-
-  for (const team of standings) {
-    let dnfCount = 0;
-    for (const rh of team.raceHistory) {
-      if (rh.points > bestSingleRace.points) {
-        bestSingleRace = { team: team.name, points: rh.points, round: rh.round };
-      }
-      for (const dr of Object.values(rh.driverResults)) {
-        if (dr.breakdown.dnf) dnfCount++;
-      }
-    }
-    if (dnfCount > mostDNFs.count) {
-      mostDNFs = { team: team.name, count: dnfCount };
-    }
-  }
-
-  return { completedRaces, bestSingleRace, mostDNFs, standings };
-}

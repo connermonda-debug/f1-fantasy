@@ -1,7 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { RESULTS, CALENDAR, DRIVERS, FANTASY_TEAMS, CONSTRUCTORS } from '../data'
 import { getRaceDetails } from '../utils'
-import { shareRaceCard } from '../utils/generateShareCard'
 
 export default function RaceView({ standings }) {
   const completedRounds = RESULTS.map(r => r.round)
@@ -24,7 +23,7 @@ export default function RaceView({ standings }) {
   }
 
   const raceCalendar = CALENDAR.find(c => c.round === selectedRound)
-  const details = getRaceDetails(selectedRound)
+  const details = useMemo(() => getRaceDetails(selectedRound), [selectedRound])
   const race = details?.race
 
   // Sort teams by points for this race
@@ -35,6 +34,7 @@ export default function RaceView({ standings }) {
     if (!details?.teamResults || sharing) return
     setSharing(true)
     try {
+      const { shareRaceCard } = await import('../utils/generateShareCard')
       await shareRaceCard(selectedRound, details.teamResults)
     } catch (e) {
       console.error('Share failed:', e)

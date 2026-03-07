@@ -294,10 +294,9 @@ async function main() {
 
       result.sprint = sprintClassified.map(r => mapDriver(r.Driver.driverId));
 
-      // Sprint DNFs (add to main DNFs list)
+      // Sprint DNFs — intentionally NOT added to result.dnfs
+      // Our scoring only penalizes race DNFs (-10), not sprint DNFs
       const sprintDNFs = sprint.SprintResults.filter(r => !isClassified(r.status));
-      // Note: sprint DNFs are separate from race DNFs in scoring
-      // but our scoring only checks race.dnfs, so sprint DNFs don't penalize
     }
 
     // Driver of the Day
