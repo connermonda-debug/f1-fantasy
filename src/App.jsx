@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { RESULTS, CALENDAR } from './data'
 import { calculateStandings } from './utils'
 import Standings from './components/Standings'
@@ -6,10 +6,12 @@ import RaceView from './components/RaceView'
 import Teams from './components/Teams'
 import Calendar from './components/Calendar'
 import Rules from './components/Rules'
+import Stats from './components/Stats'
 
 const TABS = [
   { key: 'standings', label: 'Standings' },
   { key: 'races', label: 'Races' },
+  { key: 'stats', label: 'Stats' },
   { key: 'teams', label: 'Teams' },
   { key: 'calendar', label: 'Calendar' },
   { key: 'rules', label: 'Rules' },
@@ -19,10 +21,39 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('standings')
   const standings = useMemo(() => calculateStandings(), [])
 
+  // New results toast
+  const [showToast, setShowToast] = useState(false)
+  const [newRound, setNewRound] = useState(null)
+
+  useEffect(() => {
+    if (RESULTS.length === 0) return
+    const lastSeen = parseInt(localStorage.getItem('f1fantasy_lastSeenRound') || '0')
+    const currentMax = Math.max(...RESULTS.map(r => r.round))
+    if (currentMax > lastSeen) {
+      setNewRound(currentMax)
+      setShowToast(true)
+    }
+  }, [])
+
+  const dismissToast = () => {
+    setShowToast(false)
+    if (newRound) {
+      localStorage.setItem('f1fantasy_lastSeenRound', String(newRound))
+    }
+  }
+
+  // Auto-dismiss toast after 8 seconds
+  useEffect(() => {
+    if (!showToast) return
+    const timer = setTimeout(dismissToast, 8000)
+    return () => clearTimeout(timer)
+  }, [showToast])
+
   const renderView = () => {
     switch (activeTab) {
       case 'standings': return <Standings standings={standings} />
       case 'races':     return <RaceView standings={standings} />
+      case 'stats':     return <Stats standings={standings} />
       case 'teams':     return <Teams standings={standings} />
       case 'calendar':  return <Calendar />
       case 'rules':     return <Rules />
@@ -62,6 +93,20 @@ export default function App() {
           </nav>
         </div>
       </header>
+
+      {/* New Results Toast */}
+      {showToast && newRound && (
+        <div className="toast-banner" onClick={dismissToast}>
+          <div className="toast-inner">
+            <span className="toast-icon">🏁</span>
+            <span className="toast-text">
+              New results! Round {newRound} — {CALENDAR.find(c => c.round === newRound)?.name || `Race ${newRound}`} is in.
+            </span>
+            <button className="toast-dismiss" onClick={dismissToast}>✕</button>
+          </div>
+        </div>
+      )}
+
       <main className="main">
         {renderView()}
       </main>

@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { RESULTS, CALENDAR, DRIVERS, FANTASY_TEAMS, CONSTRUCTORS } from '../data'
 import { getRaceDetails } from '../utils'
+import { shareRaceCard } from '../utils/generateShareCard'
 
 export default function RaceView({ standings }) {
   const completedRounds = RESULTS.map(r => r.round)
   const [selectedRound, setSelectedRound] = useState(
     completedRounds.length > 0 ? completedRounds[completedRounds.length - 1] : null
   )
+  const [sharing, setSharing] = useState(false)
 
   if (RESULTS.length === 0) {
     return (
@@ -29,6 +31,18 @@ export default function RaceView({ standings }) {
   const teamOrder = Object.entries(details?.teamResults || {})
     .sort(([, a], [, b]) => b.totalPoints - a.totalPoints)
 
+  const handleShare = async () => {
+    if (!details?.teamResults || sharing) return
+    setSharing(true)
+    try {
+      await shareRaceCard(selectedRound, details.teamResults)
+    } catch (e) {
+      console.error('Share failed:', e)
+    } finally {
+      setSharing(false)
+    }
+  }
+
   return (
     <div className="animate-in">
       <h1 className="page-title">Race Results</h1>
@@ -49,6 +63,14 @@ export default function RaceView({ standings }) {
             )
           })}
         </select>
+        <button
+          className="share-btn"
+          onClick={handleShare}
+          disabled={sharing}
+          title="Share race card"
+        >
+          {sharing ? '...' : '📤 Share'}
+        </button>
       </div>
 
       {/* Race Header */}

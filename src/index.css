@@ -1141,3 +1141,326 @@ select option {
   background: var(--f1-dark);
   color: var(--text-primary);
 }
+
+/* === STATS PAGE === */
+
+.stats-section {
+  margin-bottom: var(--space-2xl);
+}
+
+.stats-section-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-lg);
+  padding-left: 2px;
+}
+
+/* Stat Cards */
+.stat-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-md);
+}
+
+.stat-card {
+  background: var(--f1-card);
+  border: 1px solid var(--f1-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  border-color: var(--f1-border-light);
+  transform: translateY(-1px);
+}
+
+.stat-card-color-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.stat-card-icon {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-sm);
+}
+
+.stat-card-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-xs);
+}
+
+.stat-card-value {
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: var(--space-xs);
+}
+
+.stat-card-detail {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* === SEASON CHART === */
+
+.stats-chart-container {
+  background: var(--f1-card);
+  border: 1px solid var(--f1-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  padding-bottom: var(--space-md);
+}
+
+.season-chart {
+  position: relative;
+}
+
+.season-chart-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.chart-tooltip {
+  position: absolute;
+  transform: translate(-50%, -130%);
+  background: var(--f1-dark);
+  border: 1px solid var(--f1-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  pointer-events: none;
+  z-index: 10;
+  white-space: nowrap;
+  box-shadow: var(--shadow-hover);
+}
+
+.chart-tooltip-team {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.chart-tooltip-detail {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.chart-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chart-legend-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.chart-legend-pts {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* === RACE RECAP === */
+
+.recap-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.recap-card {
+  background: var(--f1-card);
+  border: 1px solid var(--f1-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  transition: all 0.2s ease;
+}
+
+.recap-card:hover {
+  border-color: var(--f1-border-light);
+}
+
+.recap-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.recap-round {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--f1-red);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  background: rgba(225, 6, 0, 0.1);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.recap-race-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.recap-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* === TOAST BANNER === */
+
+.toast-banner {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: linear-gradient(135deg, rgba(225, 6, 0, 0.95), rgba(200, 5, 0, 0.95));
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  animation: slideDown 0.4s ease forwards;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.toast-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-xl);
+}
+
+.toast-icon {
+  font-size: 1.2rem;
+}
+
+.toast-text {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.toast-dismiss {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.7rem;
+  transition: background 0.2s;
+}
+
+.toast-dismiss:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* === SHARE BUTTON === */
+
+.share-btn {
+  background: var(--f1-card);
+  border: 1px solid var(--f1-border);
+  color: var(--text-secondary);
+  font-family: var(--font);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.share-btn:hover {
+  background: var(--f1-card-hover);
+  border-color: var(--f1-border-light);
+  color: var(--text-primary);
+}
+
+.share-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* === RESPONSIVE — Stats === */
+
+@media (max-width: 768px) {
+  .stat-cards-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .chart-legend {
+    gap: var(--space-md);
+  }
+
+  .toast-inner {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .toast-text {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card-value {
+    font-size: 1.1rem;
+  }
+
+  .chart-legend {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+}
