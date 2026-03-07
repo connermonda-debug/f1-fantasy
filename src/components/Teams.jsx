@@ -24,7 +24,7 @@ export default function Teams({ standings }) {
                 </div>
               </div>
               <ul className="team-drivers-list">
-                {team.drivers.map(driverKey => {
+                {[...team.drivers].sort((a, b) => (standing?.driverTotals?.[b] || 0) - (standing?.driverTotals?.[a] || 0)).map(driverKey => {
                   const driver = DRIVERS[driverKey]
                   const constructor = CONSTRUCTORS[driver?.constructor]
                   const driverPts = standing?.driverTotals?.[driverKey] || 0
