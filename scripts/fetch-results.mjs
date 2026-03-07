@@ -33,6 +33,7 @@ const DRIVER_MAP = {
   lindblad: 'lindblad',
   arvid_lindblad: 'lindblad',
   hulkenberg: 'hulkenberg',
+  bortoleto: 'bortoletto',
   bortoletto: 'bortoletto',
   bottas: 'bottas',
   hadjar: 'hadjar',
