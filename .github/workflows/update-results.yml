@@ -2,13 +2,11 @@ name: Update F1 Results
 
 on:
   schedule:
-    # Run daily at 6 AM UTC (1 AM EST) — after most race weekends wrap up
-    - cron: '0 6 * * *'
-  # Also run 2 hours after typical race end times (different for different time zones)
-  # Races typically end Sunday afternoon in race-local time
-  # Additional runs to catch results faster on race weekends
-    - cron: '0 18 * * 0' # Sunday 6 PM UTC
-    - cron: '0 12 * * 0' # Sunday 12 PM UTC
+    # Run every 2 hours on Fri/Sat/Sun (race weekend coverage)
+    # Covers qualifying (usually Saturday), sprint (Saturday), race (Sunday)
+    - cron: '0 */2 * * 5,6,0'
+    # Run once daily Mon-Thu to catch any stragglers or corrections
+    - cron: '0 8 * * 1,2,3,4'
   workflow_dispatch: {} # Manual trigger from GitHub UI
 
 permissions:
