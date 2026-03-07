@@ -36,7 +36,7 @@ export const DRIVERS = {
   lawson:      { name: 'Liam Lawson',          short: 'LAW', number: 30, constructor: 'rb' },
   lindblad:    { name: 'Arvid Lindblad',       short: 'LIN', number: 2,  constructor: 'rb' },
   hulkenberg:  { name: 'Nico Hulkenberg',      short: 'HUL', number: 27, constructor: 'sauber' },
-  bortoletto:  { name: 'Gabriel Bortoletto',   short: 'BOR', number: 5,  constructor: 'sauber' },
+  bortoletto:  { name: 'Gabriel Bortoleto',    short: 'BOR', number: 5,  constructor: 'sauber' },
   bottas:      { name: 'Valtteri Bottas',      short: 'BOT', number: 77, constructor: 'cadillac' },
   perez:       { name: 'Sergio Perez',         short: 'PER', number: 11, constructor: 'cadillac' },
 };
