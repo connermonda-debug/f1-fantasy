@@ -1,26 +1,32 @@
 [
   {
     "round": 1,
-    "qualifying": [
+    "qualifying": [],
+    "race": [
       "russell",
       "antonelli",
-      "hadjar",
       "leclerc",
-      "piastri",
-      "norris",
       "hamilton",
-      "lawson",
+      "norris",
+      "verstappen"
+    ],
+    "dnfs": [
+      "bearman",
       "lindblad",
       "bortoletto",
-      "hulkenberg",
-      "bearman",
-      "ocon",
       "gasly",
+      "ocon",
       "albon",
+      "lawson",
       "colapinto",
-      "alonso",
+      "sainz",
       "perez",
-      "bottas"
+      "stroll",
+      "alonso",
+      "bottas",
+      "hadjar",
+      "piastri",
+      "hulkenberg"
     ]
   }
 ]
