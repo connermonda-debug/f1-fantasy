@@ -74,6 +74,7 @@ body {
   color: var(--text-primary);
   min-height: 100vh;
   line-height: 1.5;
+  overflow-x: hidden;
 }
 
 #root {
@@ -103,6 +104,7 @@ body {
   top: 0;
   z-index: 50;
   backdrop-filter: blur(12px);
+  overflow: hidden;
 }
 
 .header-inner {
@@ -117,7 +119,9 @@ body {
 .header-brand {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-sm) var(--space-md);
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .header-logo {
@@ -1037,6 +1041,11 @@ body {
 }
 
 @media (max-width: 768px) {
+  .header {
+    padding: var(--space-md) var(--space-md);
+    padding-top: calc(var(--space-md) + 4px);
+  }
+
   .header-inner {
     flex-direction: column;
     align-items: flex-start;
@@ -1108,7 +1117,12 @@ body {
   }
 
   .header-logo {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+  }
+
+  .header-season {
+    font-size: 0.6rem;
+    padding: 2px 6px;
   }
 
   .nav-btn {
