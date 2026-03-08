@@ -109,7 +109,7 @@ function mapDriverName(name) {
 }
 
 function isClassified(status) {
-  return status === 'Finished' || /^\+\d+ Lap/.test(status);
+  return status === 'Finished' || status === 'Lapped' || /^\+\d+ Lap/.test(status);
 }
 
 async function fetchJSON(url) {
@@ -258,14 +258,30 @@ async function main() {
 
     // Race finishing order (classified finishers only)
     if (race?.Results) {
+      // Find leader's lap count for 90% classification threshold
+      const leaderLaps = parseInt(race.Results[0]?.laps) || 0;
+      const classificationThreshold = Math.floor(leaderLaps * 0.9);
+
       const classified = race.Results
-        .filter(r => isClassified(r.status))
+        .filter(r => {
+          if (!isClassified(r.status)) return false;
+          // Drivers marked "Lapped" who completed < 90% of leader's laps
+          // are effectively retirements, not true classified finishers
+          const driverLaps = parseInt(r.laps) || 0;
+          if (r.status === 'Lapped' && driverLaps < classificationThreshold) return false;
+          return true;
+        })
         .sort((a, b) => parseInt(a.position) - parseInt(b.position));
 
       result.race = classified.map(r => mapDriver(r.Driver.driverId));
 
-      // DNFs (not classified)
-      const dnfs = race.Results.filter(r => !isClassified(r.status));
+      // DNFs — unclassified + lapped drivers below 90% threshold
+      const dnfs = race.Results.filter(r => {
+        if (!isClassified(r.status)) return true;
+        const driverLaps = parseInt(r.laps) || 0;
+        if (r.status === 'Lapped' && driverLaps < classificationThreshold) return true;
+        return false;
+      });
       if (dnfs.length > 0) {
         result.dnfs = dnfs.map(r => mapDriver(r.Driver.driverId));
       }

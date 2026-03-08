@@ -8,9 +8,7 @@
       "leclerc",
       "hamilton",
       "norris",
-      "verstappen"
-    ],
-    "dnfs": [
+      "verstappen",
       "bearman",
       "lindblad",
       "bortoletto",
@@ -20,7 +18,9 @@
       "lawson",
       "colapinto",
       "sainz",
-      "perez",
+      "perez"
+    ],
+    "dnfs": [
       "stroll",
       "alonso",
       "bottas",
