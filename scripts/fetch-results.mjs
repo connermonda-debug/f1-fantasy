@@ -244,12 +244,18 @@ async function main() {
     // Primary: use grid positions from race results (authoritative — includes penalties)
     // Fallback: qualifying session order (preliminary, before penalties are applied)
     if (race?.Results) {
-      result.qualifying = race.Results
-        .filter(r => parseInt(r.grid) > 0) // exclude pit lane starts (grid=0)
-        .sort((a, b) => parseInt(a.grid) - parseInt(b.grid))
-        .map(r => mapDriver(r.Driver.driverId));
-      console.log(`  R${round} grid: from race results (${result.qualifying.length} drivers, post-penalties)`);
-    } else if (qual?.QualifyingResults) {
+      const gridEntries = race.Results
+        .filter(r => parseInt(r.grid) > 0) // exclude pit lane starts (grid=0) and null
+        .sort((a, b) => parseInt(a.grid) - parseInt(b.grid));
+
+      if (gridEntries.length > 0) {
+        result.qualifying = gridEntries.map(r => mapDriver(r.Driver.driverId));
+        console.log(`  R${round} grid: from race results (${result.qualifying.length} drivers, post-penalties)`);
+      }
+    }
+
+    // Fallback to qualifying session if race grid data was missing or empty
+    if (!result.qualifying?.length && qual?.QualifyingResults) {
       result.qualifying = qual.QualifyingResults
         .sort((a, b) => parseInt(a.position) - parseInt(b.position))
         .map(r => mapDriver(r.Driver.driverId));

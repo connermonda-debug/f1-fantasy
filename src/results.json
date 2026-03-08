@@ -1,7 +1,27 @@
 [
   {
     "round": 1,
-    "qualifying": [],
+    "qualifying": [
+      "russell",
+      "antonelli",
+      "hadjar",
+      "leclerc",
+      "piastri",
+      "norris",
+      "hamilton",
+      "lawson",
+      "lindblad",
+      "bortoletto",
+      "hulkenberg",
+      "bearman",
+      "ocon",
+      "gasly",
+      "albon",
+      "colapinto",
+      "alonso",
+      "perez",
+      "bottas"
+    ],
     "race": [
       "russell",
       "antonelli",
