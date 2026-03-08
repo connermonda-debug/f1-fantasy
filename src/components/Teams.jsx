@@ -19,7 +19,7 @@ export default function Teams({ standings }) {
               <div className="team-card-header">
                 <div className="team-owner">{team.name}</div>
                 <div className="team-points-badge">
-                  {standing?.totalPoints || 0}
+                  {standing?.totalPoints ?? 0}
                   <small>pts</small>
                 </div>
               </div>
@@ -27,7 +27,7 @@ export default function Teams({ standings }) {
                 {[...team.drivers].sort((a, b) => (standing?.driverTotals?.[b] || 0) - (standing?.driverTotals?.[a] || 0)).map(driverKey => {
                   const driver = DRIVERS[driverKey]
                   const constructor = CONSTRUCTORS[driver?.constructor]
-                  const driverPts = standing?.driverTotals?.[driverKey] || 0
+                  const driverPts = standing?.driverTotals?.[driverKey] ?? 0
 
                   return (
                     <li key={driverKey} className="team-driver-item">
@@ -43,7 +43,7 @@ export default function Teams({ standings }) {
                         </div>
                       </div>
                       <span className="driver-season-points">
-                        {driverPts > 0 ? driverPts : '—'}
+                        {driverPts !== 0 ? driverPts : '—'}
                       </span>
                     </li>
                   )
