@@ -63,7 +63,7 @@ const CONSTRUCTOR_MAP = {
   gm: 'cadillac',
 };
 
-// ── Driver name → key (for Wikipedia DOTD parsing) ──
+// ── Driver full name → local key (for TracingInsights DOTD) ──
 const DRIVER_NAME_MAP = {
   'Max Verstappen': 'verstappen',
   'Lando Norris': 'norris',
@@ -104,10 +104,6 @@ function mapConstructor(ergastId) {
   return CONSTRUCTOR_MAP[ergastId] || ergastId;
 }
 
-function mapDriverName(name) {
-  return DRIVER_NAME_MAP[name] || null;
-}
-
 function isClassified(status) {
   return status === 'Finished' || status === 'Lapped' || /^\+\d+ Lap/.test(status);
 }
@@ -125,43 +121,47 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// ── Fetch DOTD from Wikipedia ──
-// Tries individual race articles first (most reliable), falls back to season page
+// ── Fetch DOTD from TracingInsights (GitHub) ──
 
-async function fetchDOTDForRace(raceName) {
+async function fetchDOTD(raceNames) {
+  const dotdMap = {};
   try {
-    const pageName = `${SEASON}_${raceName.replace(/ /g, '_')}`;
-    const url = `https://en.wikipedia.org/w/api.php?action=parse&page=${pageName}&prop=wikitext&format=json&origin=*`;
+    const url = `https://raw.githubusercontent.com/TracingInsights/DOTD/main/${SEASON}/dotd_${SEASON}.json`;
     const data = await fetchJSON(url);
-    const wikitext = data?.parse?.wikitext?.['*'] || '';
+    if (!data?.races) return dotdMap;
 
-    // Match infobox field: | dotd = {{flagicon|...}} [[Driver Name]]
-    const match = wikitext.match(/\|\s*dotd\s*=.*?\[\[([^\]|]+)/i);
-    if (match) {
-      const name = match[1].trim();
-      return mapDriverName(name);
-    }
-
-    // Fallback: look for "Driver of the Day" in article text
-    const dotdMatch = wikitext.match(/Driver of the Day.*?\[\[([^\]|]+)/i);
-    if (dotdMatch) {
-      const name = dotdMatch[1].trim();
-      return mapDriverName(name);
+    for (const race of data.races) {
+      if (!race.winner) continue;
+      const driverKey = DRIVER_NAME_MAP[race.winner];
+      if (!driverKey) {
+        console.log(`  DOTD: unknown driver name "${race.winner}" for ${race.race_name}`);
+        continue;
+      }
+      // Match race_name to round number via raceNames (from Jolpica)
+      const roundEntry = Object.entries(raceNames).find(
+        ([, name]) => name === race.race_name
+      );
+      if (roundEntry) {
+        dotdMap[parseInt(roundEntry[0])] = driverKey;
+      }
     }
   } catch (e) {
-    // Silent fail — DOTD is best-effort
-  }
-  return null;
-}
-
-async function fetchAllDOTD(raceNames) {
-  const dotdMap = {};
-  for (const [round, raceName] of Object.entries(raceNames)) {
-    const dotd = await fetchDOTDForRace(raceName);
-    if (dotd) dotdMap[round] = dotd;
-    await sleep(200); // Be polite to Wikipedia
+    console.log(`  DOTD: TracingInsights data not available (${e.message || '404'})`);
   }
   return dotdMap;
+}
+
+// ── Fetch fastest lap via dedicated API endpoint (fallback) ──
+
+async function fetchFastestLapForRound(round) {
+  try {
+    const data = await fetchJSON(`${API_BASE}/${SEASON}/${round}/fastest/1/results.json`);
+    const driver = data?.MRData?.RaceTable?.Races?.[0]?.Results?.[0]?.Driver;
+    if (driver) return mapDriver(driver.driverId);
+  } catch (e) {
+    // Silent fail
+  }
+  return null;
 }
 
 // ── Find fastest pit stop for a round ──
@@ -221,14 +221,24 @@ async function main() {
   for (const r of raceRaces) allRounds.add(parseInt(r.round));
   for (const r of sprintRaces) allRounds.add(parseInt(r.round));
 
-  // 5. Fetch DOTD from Wikipedia (best effort)
+  // 5. Fetch DOTD from TracingInsights
   const raceNames = {};
   for (const r of [...qualRaces, ...raceRaces]) {
     raceNames[r.round] = r.raceName;
   }
-  console.log('  Fetching DOTD from Wikipedia...');
-  const dotdMap = await fetchAllDOTD(raceNames);
+  console.log('  Fetching DOTD from TracingInsights...');
+  const dotdMap = await fetchDOTD(raceNames);
   console.log(`  DOTD: found for ${Object.keys(dotdMap).length} rounds`);
+
+  // 6. Load existing results to preserve manually-entered data
+  let existing = [];
+  try {
+    existing = JSON.parse(readFileSync(RESULTS_PATH, 'utf8'));
+  } catch {
+    // File doesn't exist or is invalid
+  }
+  const existingByRound = {};
+  for (const r of existing) existingByRound[r.round] = r;
 
   // 6. Build results for each round
   const results = [];
@@ -292,10 +302,18 @@ async function main() {
         result.dnfs = dnfs.map(r => mapDriver(r.Driver.driverId));
       }
 
-      // Fastest lap (rank 1 in FastestLap)
+      // Fastest lap — try race results first, then dedicated endpoint
       const flResult = race.Results.find(r => r.FastestLap?.rank === '1');
       if (flResult) {
         result.fastestLap = mapDriver(flResult.Driver.driverId);
+      } else {
+        console.log(`  R${round}: FastestLap not in race results, trying dedicated endpoint...`);
+        await sleep(300);
+        const flFallback = await fetchFastestLapForRound(round);
+        if (flFallback) {
+          result.fastestLap = flFallback;
+          console.log(`  R${round}: fastest lap from fallback → ${flFallback}`);
+        }
       }
 
       // Fastest pit stop
@@ -321,22 +339,32 @@ async function main() {
       const sprintDNFs = sprint.SprintResults.filter(r => !isClassified(r.status));
     }
 
-    // Driver of the Day
+    // Driver of the Day — TracingInsights first, then preserve manual entry
     if (dotdMap[round]) {
       result.driverOfTheDay = dotdMap[round];
+    }
+
+    // Preserve manually-entered fields from existing results.json
+    const prev = existingByRound[round];
+    if (prev) {
+      if (!result.driverOfTheDay && prev.driverOfTheDay) {
+        result.driverOfTheDay = prev.driverOfTheDay;
+        console.log(`  R${round}: preserved manual DOTD → ${prev.driverOfTheDay}`);
+      }
+      if (!result.fastestLap && prev.fastestLap) {
+        result.fastestLap = prev.fastestLap;
+        console.log(`  R${round}: preserved manual fastestLap → ${prev.fastestLap}`);
+      }
+      if (!result.fastestPitStop && prev.fastestPitStop) {
+        result.fastestPitStop = prev.fastestPitStop;
+        console.log(`  R${round}: preserved manual fastestPitStop → ${prev.fastestPitStop}`);
+      }
     }
 
     results.push(result);
   }
 
   // 7. Compare with existing and save if changed
-  let existing = [];
-  try {
-    existing = JSON.parse(readFileSync(RESULTS_PATH, 'utf8'));
-  } catch {
-    // File doesn't exist or is invalid
-  }
-
   const newJSON = JSON.stringify(results, null, 2);
   const oldJSON = JSON.stringify(existing, null, 2);
 

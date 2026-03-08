@@ -74,7 +74,7 @@ export const SCORING = {
   qualifying: { 1: 10, 2: 9, 3: 8, 4: 7, 5: 6, 6: 5, 7: 4, 8: 3, 9: 2, 10: 1 },
   race:       { 1: 25, 2: 18, 3: 15, 4: 12, 5: 10, 6: 8, 7: 6, 8: 4, 9: 2, 10: 1 },
   sprint:     { 1: 8, 2: 7, 3: 6, 4: 5, 5: 4, 6: 3, 7: 2, 8: 1 },
-  fastestLap: 10,
+  fastestLap: 3,
   driverOfTheDay: 3,
   dnf: -10,
   fastestPitStop: 5,
@@ -85,7 +85,7 @@ export const SCORING = {
 // === 2026 RACE CALENDAR ===
 export const CALENDAR = [
   { round: 1,  name: 'Australian Grand Prix',      location: 'Melbourne',     circuit: 'Albert Park',              date: '2026-03-08', sprint: false },
-  { round: 2,  name: 'Chinese Grand Prix',          location: 'Shanghai',      circuit: 'Shanghai International',   date: '2026-03-22', sprint: true },
+  { round: 2,  name: 'Chinese Grand Prix',          location: 'Shanghai',      circuit: 'Shanghai International',   date: '2026-03-15', sprint: true },
   { round: 3,  name: 'Japanese Grand Prix',          location: 'Suzuka',        circuit: 'Suzuka Circuit',           date: '2026-04-05', sprint: false },
   { round: 4,  name: 'Bahrain Grand Prix',           location: 'Sakhir',        circuit: 'Bahrain International',    date: '2026-04-12', sprint: false },
   { round: 5,  name: 'Saudi Arabian Grand Prix',     location: 'Jeddah',        circuit: 'Jeddah Corniche',          date: '2026-04-19', sprint: true },

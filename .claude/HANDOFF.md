@@ -40,7 +40,7 @@ A React SPA that tracks a 4-person F1 fantasy league for the 2026 season. Each p
 | Qualifying P1-P10 | 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 |
 | Race P1-P10 | 25, 18, 15, 12, 10, 8, 6, 4, 2, 1 |
 | Sprint P1-P8 | 8, 7, 6, 5, 4, 3, 2, 1 |
-| Fastest Lap | +10 |
+| Fastest Lap | +3 |
 | Driver of the Day | +3 |
 | DNF (race only) | -10 |
 | Fastest Pit Stop | +5 (constructor bonus — team must have BOTH drivers from that constructor) |
@@ -235,8 +235,8 @@ export PATH="$HOME/bin:$PATH" && git push origin main # Push → Vercel auto-dep
 
 ## Known Limitations
 - **No backend** — fully static, client-side scoring
-- **DOTD is best-effort** — Wikipedia parsing can fail; may need manual entry
-- **Fastest lap sometimes missing from API** — Jolpica may lag; manual fallback needed
+- **DOTD from TracingInsights** — fetches from GitHub (`TracingInsights/DOTD` repo); falls back to manual entry in results.json (preserved across fetches)
+- **Fastest lap has fallback** — tries race results first, then dedicated `/fastest/1/results.json` endpoint; manual entries preserved across fetches
 - **Fixed 4-player league** — can't add/remove players without code changes
 - **No live updates** — results sync on GitHub Actions schedule, not real-time
 - **Season-end bonuses (WDC +25, WCC +50) not yet implemented** — need to add after season ends

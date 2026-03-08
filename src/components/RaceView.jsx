@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { RESULTS, CALENDAR, DRIVERS, FANTASY_TEAMS, CONSTRUCTORS } from '../data'
+import { RESULTS, CALENDAR, DRIVERS, FANTASY_TEAMS, CONSTRUCTORS, SCORING } from '../data'
 import { getRaceDetails } from '../utils'
 
 export default function RaceView({ standings }) {
@@ -93,26 +93,26 @@ export default function RaceView({ standings }) {
         <div className="race-bonuses" style={{ marginBottom: 'var(--space-xl)' }}>
           <div className="bonus-grid">
             <div className="bonus-item">
-              <span className="bonus-label">Fastest Lap (+{10})</span>
+              <span className="bonus-label">Fastest Lap (+{SCORING.fastestLap})</span>
               <span className="bonus-value">
                 {race.fastestLap ? DRIVERS[race.fastestLap]?.name : '—'}
               </span>
             </div>
             <div className="bonus-item">
-              <span className="bonus-label">Driver of the Day (+{3})</span>
+              <span className="bonus-label">Driver of the Day (+{SCORING.driverOfTheDay})</span>
               <span className="bonus-value">
                 {race.driverOfTheDay ? DRIVERS[race.driverOfTheDay]?.name : '—'}
               </span>
             </div>
             <div className="bonus-item">
-              <span className="bonus-label">Fastest Pit Stop (+{5})</span>
+              <span className="bonus-label">Fastest Pit Stop (+{SCORING.fastestPitStop})</span>
               <span className="bonus-value">
                 {race.fastestPitStop ? CONSTRUCTORS[race.fastestPitStop]?.name : '—'}
               </span>
             </div>
             {race.dnfs && race.dnfs.length > 0 && (
               <div className="bonus-item">
-                <span className="bonus-label">DNFs (-{10} each)</span>
+                <span className="bonus-label">DNFs ({SCORING.dnf} each)</span>
                 <span className="bonus-value" style={{ color: '#EF4444' }}>
                   {race.dnfs.map(d => DRIVERS[d]?.short || d).join(', ')}
                 </span>
