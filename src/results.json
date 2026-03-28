@@ -131,5 +131,32 @@
       "perez"
     ],
     "driverOfTheDay": "antonelli"
+  },
+  {
+    "round": 3,
+    "qualifying": [
+      "antonelli",
+      "russell",
+      "piastri",
+      "leclerc",
+      "norris",
+      "hamilton",
+      "gasly",
+      "hadjar",
+      "bortoletto",
+      "lindblad",
+      "verstappen",
+      "ocon",
+      "hulkenberg",
+      "lawson",
+      "colapinto",
+      "sainz",
+      "albon",
+      "bearman",
+      "perez",
+      "bottas",
+      "alonso",
+      "stroll"
+    ]
   }
 ]
