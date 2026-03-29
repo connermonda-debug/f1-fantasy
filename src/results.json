@@ -157,6 +157,34 @@
       "bottas",
       "alonso",
       "stroll"
-    ]
+    ],
+    "race": [
+      "antonelli",
+      "piastri",
+      "leclerc",
+      "russell",
+      "norris",
+      "hamilton",
+      "gasly",
+      "verstappen",
+      "lawson",
+      "ocon",
+      "hulkenberg",
+      "hadjar",
+      "bortoletto",
+      "lindblad",
+      "sainz",
+      "colapinto",
+      "perez",
+      "alonso",
+      "bottas",
+      "albon"
+    ],
+    "dnfs": [
+      "stroll",
+      "bearman"
+    ],
+    "fastestLap": "antonelli",
+    "fastestPitStop": "ferrari"
   }
 ]
