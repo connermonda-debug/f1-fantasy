@@ -344,20 +344,44 @@ async function main() {
       result.driverOfTheDay = dotdMap[round];
     }
 
-    // Preserve manually-entered fields from existing results.json
+    // Preserve existing data when API returns less than what we already have.
+    // The API can briefly drop session data (delays after race end, transient
+    // 404s, mid-update reads). Once data lands in results.json it should stick;
+    // a later fetch with real data will overwrite, but a fetch with no data
+    // for a session won't wipe it.
     const prev = existingByRound[round];
     if (prev) {
+      // Bonuses and DOTD — preserved as before
       if (!result.driverOfTheDay && prev.driverOfTheDay) {
         result.driverOfTheDay = prev.driverOfTheDay;
-        console.log(`  R${round}: preserved manual DOTD → ${prev.driverOfTheDay}`);
+        console.log(`  R${round}: preserved DOTD → ${prev.driverOfTheDay}`);
       }
       if (!result.fastestLap && prev.fastestLap) {
         result.fastestLap = prev.fastestLap;
-        console.log(`  R${round}: preserved manual fastestLap → ${prev.fastestLap}`);
+        console.log(`  R${round}: preserved fastestLap → ${prev.fastestLap}`);
       }
       if (!result.fastestPitStop && prev.fastestPitStop) {
         result.fastestPitStop = prev.fastestPitStop;
-        console.log(`  R${round}: preserved manual fastestPitStop → ${prev.fastestPitStop}`);
+        console.log(`  R${round}: preserved fastestPitStop → ${prev.fastestPitStop}`);
+      }
+      // Session arrays — only fall back to prev if API returned nothing.
+      // If API returns a non-empty array, trust it (corrections like DSQs,
+      // post-race penalties, reclassification).
+      if ((!result.race || result.race.length === 0) && prev.race?.length) {
+        result.race = prev.race;
+        console.log(`  R${round}: preserved race results (${prev.race.length} drivers) — API had none`);
+      }
+      if ((!result.qualifying || result.qualifying.length === 0) && prev.qualifying?.length) {
+        result.qualifying = prev.qualifying;
+        console.log(`  R${round}: preserved qualifying (${prev.qualifying.length} drivers) — API had none`);
+      }
+      if ((!result.sprint || result.sprint.length === 0) && prev.sprint?.length) {
+        result.sprint = prev.sprint;
+        console.log(`  R${round}: preserved sprint (${prev.sprint.length} drivers) — API had none`);
+      }
+      if ((!result.dnfs || result.dnfs.length === 0) && prev.dnfs?.length) {
+        result.dnfs = prev.dnfs;
+        console.log(`  R${round}: preserved DNFs (${prev.dnfs.length} drivers) — API had none`);
       }
     }
 

@@ -2,11 +2,16 @@ name: Update F1 Results
 
 on:
   schedule:
-    # Run every 2 hours on Fri/Sat/Sun (race weekend coverage)
-    # Covers qualifying (usually Saturday), sprint (Saturday), race (Sunday)
-    - cron: '0 */2 * * 5,6,0'
-    # Run once daily Mon-Thu to catch any stragglers or corrections
-    - cron: '0 8 * * 1,2,3,4'
+    # Race day (Sunday) — every 30 min, 12:00–23:30 UTC.
+    # Most races finish 14:00–22:00 UTC; tight cadence ensures results land
+    # within ~30 min of the API publishing them.
+    - cron: '*/30 12-23 * * 0'
+    # Friday/Saturday — every 2 hours (qualifying + sprint coverage)
+    - cron: '0 */2 * * 5,6'
+    # Sunday early hours / Monday — once at 06:00 UTC to catch late corrections
+    - cron: '0 6 * * 1'
+    # Mon–Thu — once daily at 08:00 UTC for stragglers and reclassifications
+    - cron: '0 8 * * 2,3,4'
   workflow_dispatch: {} # Manual trigger from GitHub UI
 
 permissions:
