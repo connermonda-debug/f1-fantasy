@@ -199,7 +199,6 @@
       "hamilton",
       "piastri",
       "colapinto",
-      "hadjar",
       "gasly",
       "hulkenberg",
       "lawson",
@@ -212,8 +211,37 @@
       "stroll",
       "bottas",
       "perez",
-      "bortoletto"
+      "bortoletto",
+      "hadjar"
     ],
+    "race": [
+      "antonelli",
+      "norris",
+      "piastri",
+      "russell",
+      "verstappen",
+      "leclerc",
+      "hamilton",
+      "colapinto",
+      "sainz",
+      "albon",
+      "bearman",
+      "bortoletto",
+      "ocon",
+      "lindblad",
+      "alonso",
+      "perez",
+      "stroll",
+      "bottas"
+    ],
+    "dnfs": [
+      "hulkenberg",
+      "lawson",
+      "gasly",
+      "hadjar"
+    ],
+    "fastestLap": "norris",
+    "fastestPitStop": "cadillac",
     "sprint": [
       "norris",
       "piastri",
