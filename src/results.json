@@ -264,5 +264,31 @@
       "bottas"
     ],
     "driverOfTheDay": "verstappen"
+  },
+  {
+    "round": 5,
+    "sprint": [
+      "russell",
+      "norris",
+      "antonelli",
+      "piastri",
+      "leclerc",
+      "hamilton",
+      "verstappen",
+      "lindblad",
+      "colapinto",
+      "sainz",
+      "lawson",
+      "bortoletto",
+      "ocon",
+      "perez",
+      "hulkenberg",
+      "stroll",
+      "bottas",
+      "bearman",
+      "albon",
+      "gasly",
+      "hadjar"
+    ]
   }
 ]
