@@ -267,6 +267,23 @@
   },
   {
     "round": 5,
+    "qualifying": [
+      "russell",
+      "antonelli",
+      "norris",
+      "piastri",
+      "hamilton",
+      "verstappen",
+      "hadjar",
+      "leclerc",
+      "lindblad",
+      "colapinto",
+      "hulkenberg",
+      "lawson",
+      "bortoletto",
+      "sainz",
+      "bearman"
+    ],
     "sprint": [
       "russell",
       "norris",
