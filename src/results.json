@@ -268,22 +268,34 @@
   {
     "round": 5,
     "qualifying": [
-      "russell",
       "antonelli",
-      "norris",
       "piastri",
       "hamilton",
       "verstappen",
       "hadjar",
       "leclerc",
-      "lindblad",
       "colapinto",
       "hulkenberg",
       "lawson",
-      "bortoletto",
+      "gasly",
       "sainz",
       "bearman"
     ],
+    "race": [
+      "antonelli",
+      "hamilton",
+      "verstappen",
+      "leclerc",
+      "hadjar",
+      "colapinto",
+      "lawson",
+      "gasly",
+      "sainz",
+      "bearman",
+      "piastri",
+      "hulkenberg"
+    ],
+    "fastestLap": "antonelli",
     "sprint": [
       "russell",
       "norris",
