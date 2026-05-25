@@ -190,24 +190,90 @@ function findFastestPitStop(pitStopData, raceResults) {
   return mapConstructor(result.Constructor.constructorId);
 }
 
+// ── Fetch one round's full dataset ──
+// CRITICAL: Jolpica's `limit` parameter silently caps at 100, even when we ask
+// for more. The season-wide endpoints (e.g. /2026/results.json) blow past 100
+// total rows after ~5 races (5 × 22 drivers = 110), and the LAST rounds get
+// truncated — losing the drivers with the lowest finishing positions, which
+// are exactly the DNFs and retirements we need for scoring. We fetch each
+// round individually so each session stays well under the 100-row cap.
+async function fetchRoundSession(round, session) {
+  // session = 'qualifying' | 'results' | 'sprint'
+  const data = await fetchJSON(`${API_BASE}/${SEASON}/${round}/${session}.json?limit=100`);
+  return data?.MRData?.RaceTable?.Races?.[0] || null;
+}
+
+// ── Discover which rounds have any data this season ──
+async function discoverRounds() {
+  // The schedule endpoint tells us every round that EXISTS (whether or not it
+  // has run yet). We then probe each round's qualifying/results/sprint
+  // endpoints individually — slower but accurate, with no pagination risk.
+  const seasonMeta = await fetchJSON(`${API_BASE}/${SEASON}.json?limit=100`);
+  const scheduled = seasonMeta?.MRData?.RaceTable?.Races || [];
+  // Only probe rounds whose race date is today or earlier — saves API calls
+  // and avoids speculative fetches for future races.
+  const today = new Date().toISOString().slice(0, 10);
+  return scheduled
+    .filter(r => r.date && r.date <= today)
+    .map(r => ({ round: parseInt(r.round), raceName: r.raceName }));
+}
+
+// ── Sanity check on a built round entry ──
+// If a race entry exists, we expect at least 18 drivers represented across
+// race + dnfs (a few may be DNS, but never half the field missing). Same for
+// qualifying. This catches truncation, partial fetches, or other anomalies
+// BEFORE they overwrite good data on disk.
+function validateRound(result) {
+  const issues = [];
+  if (result.race) {
+    const totalAccountedFor = (result.race?.length || 0) + (result.dnfs?.length || 0);
+    if (totalAccountedFor < 18) {
+      issues.push(`only ${totalAccountedFor} drivers across race+dnfs (expected ≥18)`);
+    }
+  }
+  if (result.qualifying && result.qualifying.length < 18) {
+    issues.push(`only ${result.qualifying.length} drivers in qualifying (expected ≥18)`);
+  }
+  if (result.sprint && result.sprint.length < 15) {
+    issues.push(`only ${result.sprint.length} drivers in sprint (expected ≥15)`);
+  }
+  return issues;
+}
+
 // ── Main ──
 
 async function main() {
   console.log(`Fetching ${SEASON} F1 results...`);
 
-  // 1. Fetch all qualifying results for the season (fallback for grid positions)
-  const qualData = await fetchJSON(`${API_BASE}/${SEASON}/qualifying.json?limit=1000`);
-  const qualRaces = qualData?.MRData?.RaceTable?.Races || [];
+  // 1. Discover which rounds to fetch (only ones whose date has passed)
+  const roundList = await discoverRounds();
+  if (roundList.length === 0) {
+    console.log('No completed rounds yet for this season.');
+    return;
+  }
+  console.log(`  Rounds to fetch: ${roundList.length}`);
+
+  // 2. Fetch each round's three sessions individually (avoids 100-row cap)
+  const qualByRound = {};
+  const raceByRound = {};
+  const sprintByRound = {};
+  for (const { round } of roundList) {
+    await sleep(150);
+    const [q, r, s] = await Promise.all([
+      fetchRoundSession(round, 'qualifying'),
+      fetchRoundSession(round, 'results'),
+      fetchRoundSession(round, 'sprint'),
+    ]);
+    if (q) qualByRound[round] = q;
+    if (r) raceByRound[round] = r;
+    if (s) sprintByRound[round] = s;
+  }
+
+  const qualRaces = Object.values(qualByRound);
+  const raceRaces = Object.values(raceByRound);
+  const sprintRaces = Object.values(sprintByRound);
   console.log(`  Qualifying sessions: ${qualRaces.length} rounds`);
-
-  // 2. Fetch all race results for the season
-  const raceData = await fetchJSON(`${API_BASE}/${SEASON}/results.json?limit=1000`);
-  const raceRaces = raceData?.MRData?.RaceTable?.Races || [];
   console.log(`  Races: ${raceRaces.length} rounds`);
-
-  // 3. Fetch all sprint results for the season
-  const sprintData = await fetchJSON(`${API_BASE}/${SEASON}/sprint.json?limit=1000`);
-  const sprintRaces = sprintData?.MRData?.RaceTable?.Races || [];
   console.log(`  Sprints: ${sprintRaces.length} rounds`);
 
   if (qualRaces.length === 0 && raceRaces.length === 0) {
@@ -215,7 +281,7 @@ async function main() {
     return;
   }
 
-  // 4. Collect all rounds that have any data
+  // 3. Collect all rounds that have any data
   const allRounds = new Set();
   for (const r of qualRaces) allRounds.add(parseInt(r.round));
   for (const r of raceRaces) allRounds.add(parseInt(r.round));
@@ -382,6 +448,22 @@ async function main() {
       if ((!result.dnfs || result.dnfs.length === 0) && prev.dnfs?.length) {
         result.dnfs = prev.dnfs;
         console.log(`  R${round}: preserved DNFs (${prev.dnfs.length} drivers) — API had none`);
+      }
+    }
+
+    // Sanity check — refuse to overwrite a previously good round with
+    // suspicious data (e.g., 12 drivers when we expect 22).
+    const issues = validateRound(result);
+    if (issues.length > 0) {
+      const prevIssues = prev ? validateRound(prev) : ['no previous data'];
+      if (prev && prevIssues.length === 0) {
+        // Previous data was good; new data has problems. Keep previous.
+        console.log(`  ⚠️  R${round}: new data failed validation (${issues.join('; ')}). Keeping previous round entry intact.`);
+        results.push(prev);
+        continue;
+      } else {
+        // No good previous data — emit the new data but loudly warn.
+        console.log(`  ⚠️  R${round}: data quality concerns (${issues.join('; ')}) — no clean previous to fall back to, writing anyway.`);
       }
     }
 
