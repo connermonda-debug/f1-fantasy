@@ -210,11 +210,20 @@ async function discoverRounds() {
   // endpoints individually — slower but accurate, with no pagination risk.
   const seasonMeta = await fetchJSON(`${API_BASE}/${SEASON}.json?limit=100`);
   const scheduled = seasonMeta?.MRData?.RaceTable?.Races || [];
-  // Only probe rounds whose race date is today or earlier — saves API calls
-  // and avoids speculative fetches for future races.
-  const today = new Date().toISOString().slice(0, 10);
+  // Probe rounds whose race date is within the next 4 days OR has passed.
+  // Sprint weekends start Friday (2 days before race), regular weekends
+  // start Friday practice with Saturday qualifying. The +4 window catches
+  // session data published before race day (qualifying, sprint, practice).
+  // Empty-response handling and validateRound() ensure rounds without data
+  // yet don't pollute results.json.
+  const todayMs = new Date().setUTCHours(0, 0, 0, 0);
+  const FOUR_DAYS_MS = 4 * 24 * 60 * 60 * 1000;
   return scheduled
-    .filter(r => r.date && r.date <= today)
+    .filter(r => {
+      if (!r.date) return false;
+      const raceMs = new Date(r.date + 'T00:00:00Z').getTime();
+      return raceMs <= todayMs + FOUR_DAYS_MS;
+    })
     .map(r => ({ round: parseInt(r.round), raceName: r.raceName }));
 }
 

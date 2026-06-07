@@ -343,5 +343,32 @@
       "hadjar"
     ],
     "driverOfTheDay": "hamilton"
+  },
+  {
+    "round": 6,
+    "qualifying": [
+      "antonelli",
+      "verstappen",
+      "hamilton",
+      "leclerc",
+      "hadjar",
+      "russell",
+      "piastri",
+      "norris",
+      "gasly",
+      "lawson",
+      "albon",
+      "sainz",
+      "hulkenberg",
+      "colapinto",
+      "lindblad",
+      "bortoletto",
+      "ocon",
+      "perez",
+      "bearman",
+      "bottas",
+      "alonso",
+      "stroll"
+    ]
   }
 ]
