@@ -380,12 +380,12 @@
       "gasly",
       "albon",
       "ocon",
-      "perez",
       "alonso",
       "bortoletto",
       "russell",
       "hulkenberg",
-      "colapinto"
+      "colapinto",
+      "perez"
     ],
     "dnfs": [
       "sainz",
@@ -397,6 +397,7 @@
       "verstappen"
     ],
     "fastestLap": "antonelli",
+    "fastestPitStop": "rb",
     "driverOfTheDay": "antonelli"
   }
 ]
