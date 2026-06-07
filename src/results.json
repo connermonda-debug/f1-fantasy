@@ -370,6 +370,32 @@
       "alonso",
       "stroll"
     ],
+    "race": [
+      "antonelli",
+      "hamilton",
+      "hadjar",
+      "piastri",
+      "lawson",
+      "lindblad",
+      "gasly",
+      "albon",
+      "ocon",
+      "perez",
+      "alonso",
+      "bortoletto",
+      "russell",
+      "hulkenberg",
+      "colapinto"
+    ],
+    "dnfs": [
+      "sainz",
+      "leclerc",
+      "stroll",
+      "norris",
+      "bearman",
+      "bottas",
+      "verstappen"
+    ],
     "driverOfTheDay": "antonelli"
   }
 ]
