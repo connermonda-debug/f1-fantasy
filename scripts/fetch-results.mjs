@@ -108,17 +108,64 @@ function isClassified(status) {
   return status === 'Finished' || status === 'Lapped' || /^\+\d+ Lap/.test(status);
 }
 
-async function fetchJSON(url) {
-  const res = await fetch(url);
-  if (!res.ok) {
-    if (res.status === 404) return null;
-    throw new Error(`HTTP ${res.status} for ${url}`);
-  }
-  return res.json();
-}
-
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Custom error so callers can distinguish "API unreachable" from "bad data".
+class ApiUnreachableError extends Error {
+  constructor(url, cause) {
+    super(`API unreachable: ${url} (${cause?.code || cause?.message || cause})`);
+    this.name = 'ApiUnreachableError';
+  }
+}
+
+// fetchJSON with timeout + retry on transient failures.
+// - 30s per-request timeout (Jolpica is sometimes slow but usually responds)
+// - 3 attempts with exponential backoff (1s, 3s, 9s)
+// - 404 → returns null (the round/session doesn't exist yet, which is normal)
+// - Final failure throws ApiUnreachableError, never crashes the process
+async function fetchJSON(url, { attempts = 3 } = {}) {
+  let lastErr = null;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30_000);
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (!res.ok) {
+        if (res.status === 404) return null;
+        // 5xx — server error, worth retrying
+        if (res.status >= 500 && attempt < attempts) {
+          lastErr = new Error(`HTTP ${res.status} for ${url}`);
+          await sleep(1000 * Math.pow(3, attempt - 1));
+          continue;
+        }
+        throw new Error(`HTTP ${res.status} for ${url}`);
+      }
+      return res.json();
+    } catch (err) {
+      clearTimeout(timeoutId);
+      lastErr = err;
+      // Network-level failures (timeout, DNS, connection refused) — retry
+      const isNetwork = err.name === 'AbortError' ||
+                        err.code === 'UND_ERR_CONNECT_TIMEOUT' ||
+                        err.code === 'ENOTFOUND' ||
+                        err.code === 'ECONNREFUSED' ||
+                        err.code === 'ECONNRESET' ||
+                        err.cause?.code === 'UND_ERR_CONNECT_TIMEOUT' ||
+                        err.cause?.code === 'ECONNREFUSED';
+      if (isNetwork && attempt < attempts) {
+        console.log(`  retry ${attempt}/${attempts} for ${url} (${err.code || err.cause?.code || err.message})`);
+        await sleep(1000 * Math.pow(3, attempt - 1));
+        continue;
+      }
+      // Out of retries on a network error — surface as ApiUnreachableError
+      if (isNetwork) throw new ApiUnreachableError(url, err);
+      throw err;
+    }
+  }
+  throw new ApiUnreachableError(url, lastErr);
 }
 
 // ── Fetch DOTD from TracingInsights (GitHub) ──
@@ -255,7 +302,17 @@ async function main() {
   console.log(`Fetching ${SEASON} F1 results...`);
 
   // 1. Discover which rounds to fetch (only ones whose date has passed)
-  const roundList = await discoverRounds();
+  let roundList;
+  try {
+    roundList = await discoverRounds();
+  } catch (err) {
+    if (err instanceof ApiUnreachableError) {
+      console.log(`  ⚠️  Jolpica API unreachable for schedule lookup: ${err.message}`);
+      console.log(`  Skipping this run — next scheduled run will retry. No data changed.`);
+      return; // Exit 0 — not a failure, just a temporary outage
+    }
+    throw err;
+  }
   if (roundList.length === 0) {
     console.log('No completed rounds yet for this season.');
     return;
@@ -263,19 +320,38 @@ async function main() {
   console.log(`  Rounds to fetch: ${roundList.length}`);
 
   // 2. Fetch each round's three sessions individually (avoids 100-row cap)
+  // Track per-round outages — if a round's whole fetch fails, the
+  // preservation logic later will keep existing data on disk.
   const qualByRound = {};
   const raceByRound = {};
   const sprintByRound = {};
+  const failedRounds = [];
   for (const { round } of roundList) {
     await sleep(150);
-    const [q, r, s] = await Promise.all([
-      fetchRoundSession(round, 'qualifying'),
-      fetchRoundSession(round, 'results'),
-      fetchRoundSession(round, 'sprint'),
-    ]);
-    if (q) qualByRound[round] = q;
-    if (r) raceByRound[round] = r;
-    if (s) sprintByRound[round] = s;
+    try {
+      const [q, r, s] = await Promise.all([
+        fetchRoundSession(round, 'qualifying'),
+        fetchRoundSession(round, 'results'),
+        fetchRoundSession(round, 'sprint'),
+      ]);
+      if (q) qualByRound[round] = q;
+      if (r) raceByRound[round] = r;
+      if (s) sprintByRound[round] = s;
+    } catch (err) {
+      if (err instanceof ApiUnreachableError) {
+        console.log(`  ⚠️  R${round}: API unreachable, will preserve existing data`);
+        failedRounds.push(round);
+        continue;
+      }
+      throw err;
+    }
+  }
+
+  // If every round failed, the API is fully down — exit cleanly, no diff to write.
+  if (failedRounds.length === roundList.length) {
+    console.log(`  ⚠️  All ${roundList.length} rounds failed to fetch. API appears fully down.`);
+    console.log(`  Skipping this run — next scheduled run will retry. No data changed.`);
+    return;
   }
 
   const qualRaces = Object.values(qualByRound);
@@ -384,20 +460,32 @@ async function main() {
       } else {
         console.log(`  R${round}: FastestLap not in race results, trying dedicated endpoint...`);
         await sleep(300);
-        const flFallback = await fetchFastestLapForRound(round);
-        if (flFallback) {
-          result.fastestLap = flFallback;
-          console.log(`  R${round}: fastest lap from fallback → ${flFallback}`);
+        try {
+          const flFallback = await fetchFastestLapForRound(round);
+          if (flFallback) {
+            result.fastestLap = flFallback;
+            console.log(`  R${round}: fastest lap from fallback → ${flFallback}`);
+          }
+        } catch (err) {
+          if (err instanceof ApiUnreachableError) {
+            console.log(`  R${round}: FL fallback unreachable, preservation logic will keep prior value`);
+          } else { throw err; }
         }
       }
 
-      // Fastest pit stop
+      // Fastest pit stop — non-critical, skip on failure
       console.log(`  Fetching pit stops for round ${round}...`);
       await sleep(300);
-      const pitData = await fetchJSON(`${API_BASE}/${SEASON}/${round}/pitstops.json?limit=100`);
-      const fastestPit = findFastestPitStop(pitData, race.Results);
-      if (fastestPit) {
-        result.fastestPitStop = fastestPit;
+      try {
+        const pitData = await fetchJSON(`${API_BASE}/${SEASON}/${round}/pitstops.json?limit=100`);
+        const fastestPit = findFastestPitStop(pitData, race.Results);
+        if (fastestPit) {
+          result.fastestPitStop = fastestPit;
+        }
+      } catch (err) {
+        if (err instanceof ApiUnreachableError) {
+          console.log(`  R${round}: pit stops unreachable, preservation logic will keep prior value`);
+        } else { throw err; }
       }
     }
 
@@ -492,6 +580,13 @@ async function main() {
 }
 
 main().catch(err => {
+  // Treat API outages as soft failures — don't fail the workflow run, since
+  // the next scheduled run will pick up automatically once the API is back.
+  if (err instanceof ApiUnreachableError) {
+    console.log(`\n⚠️  API unreachable: ${err.message}`);
+    console.log(`Next scheduled run will retry. Exiting cleanly to avoid failure-notification spam.`);
+    process.exit(0);
+  }
   console.error('Fatal error:', err);
   process.exit(1);
 });
