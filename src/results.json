@@ -399,5 +399,32 @@
     "fastestLap": "antonelli",
     "fastestPitStop": "rb",
     "driverOfTheDay": "antonelli"
+  },
+  {
+    "round": 7,
+    "qualifying": [
+      "russell",
+      "hamilton",
+      "antonelli",
+      "norris",
+      "verstappen",
+      "hadjar",
+      "piastri",
+      "lawson",
+      "hulkenberg",
+      "leclerc",
+      "lindblad",
+      "bortoletto",
+      "colapinto",
+      "gasly",
+      "bearman",
+      "sainz",
+      "ocon",
+      "albon",
+      "perez",
+      "bottas",
+      "stroll",
+      "alonso"
+    ]
   }
 ]
