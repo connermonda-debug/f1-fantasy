@@ -454,5 +454,32 @@
     ],
     "fastestLap": "hamilton",
     "fastestPitStop": "williams"
+  },
+  {
+    "round": 8,
+    "qualifying": [
+      "russell",
+      "leclerc",
+      "hamilton",
+      "antonelli",
+      "verstappen",
+      "norris",
+      "piastri",
+      "hadjar",
+      "lawson",
+      "lindblad",
+      "gasly",
+      "bortoletto",
+      "bearman",
+      "hulkenberg",
+      "ocon",
+      "colapinto",
+      "sainz",
+      "albon",
+      "perez",
+      "bottas",
+      "alonso",
+      "stroll"
+    ]
   }
 ]
