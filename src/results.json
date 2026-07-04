@@ -510,5 +510,32 @@
     "fastestLap": "antonelli",
     "fastestPitStop": "ferrari",
     "driverOfTheDay": "verstappen"
+  },
+  {
+    "round": 9,
+    "sprint": [
+      "antonelli",
+      "hamilton",
+      "norris",
+      "russell",
+      "leclerc",
+      "verstappen",
+      "piastri",
+      "lawson",
+      "hadjar",
+      "lindblad",
+      "gasly",
+      "colapinto",
+      "bortoletto",
+      "bearman",
+      "hulkenberg",
+      "ocon",
+      "sainz",
+      "albon",
+      "bottas",
+      "alonso",
+      "stroll",
+      "perez"
+    ]
   }
 ]
