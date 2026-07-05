@@ -525,18 +525,46 @@
       "lindblad",
       "lawson",
       "bortoletto",
-      "gasly",
       "hulkenberg",
       "bearman",
       "sainz",
+      "gasly",
       "albon",
       "ocon",
       "bottas",
       "colapinto",
       "perez",
-      "stroll",
-      "alonso"
+      "alonso",
+      "stroll"
     ],
+    "race": [
+      "leclerc",
+      "russell",
+      "hamilton",
+      "norris",
+      "hadjar",
+      "lawson",
+      "lindblad",
+      "bortoletto",
+      "colapinto",
+      "gasly",
+      "piastri",
+      "sainz",
+      "bearman",
+      "ocon",
+      "perez",
+      "antonelli",
+      "bottas",
+      "alonso",
+      "stroll"
+    ],
+    "dnfs": [
+      "verstappen",
+      "albon",
+      "hulkenberg"
+    ],
+    "fastestLap": "antonelli",
+    "fastestPitStop": "mercedes",
     "sprint": [
       "antonelli",
       "hamilton",
@@ -560,6 +588,7 @@
       "alonso",
       "stroll",
       "perez"
-    ]
+    ],
+    "driverOfTheDay": "leclerc"
   }
 ]
