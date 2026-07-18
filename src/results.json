@@ -590,5 +590,32 @@
       "perez"
     ],
     "driverOfTheDay": "leclerc"
+  },
+  {
+    "round": 10,
+    "qualifying": [
+      "antonelli",
+      "verstappen",
+      "norris",
+      "russell",
+      "leclerc",
+      "hamilton",
+      "piastri",
+      "lindblad",
+      "bortoletto",
+      "hadjar",
+      "lawson",
+      "gasly",
+      "colapinto",
+      "hulkenberg",
+      "sainz",
+      "bearman",
+      "albon",
+      "ocon",
+      "bottas",
+      "perez",
+      "alonso",
+      "stroll"
+    ]
   }
 ]
