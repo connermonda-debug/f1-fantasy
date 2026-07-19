@@ -596,26 +596,54 @@
     "qualifying": [
       "antonelli",
       "verstappen",
-      "norris",
       "russell",
       "leclerc",
       "hamilton",
       "piastri",
       "lindblad",
       "bortoletto",
-      "hadjar",
       "lawson",
       "gasly",
       "colapinto",
       "hulkenberg",
-      "sainz",
+      "norris",
       "bearman",
       "albon",
       "ocon",
       "bottas",
       "perez",
-      "alonso",
-      "stroll"
-    ]
+      "sainz",
+      "stroll",
+      "hadjar",
+      "alonso"
+    ],
+    "race": [
+      "antonelli",
+      "leclerc",
+      "verstappen",
+      "hamilton",
+      "piastri",
+      "hadjar",
+      "norris",
+      "bortoletto",
+      "lindblad",
+      "colapinto",
+      "gasly",
+      "lawson",
+      "hulkenberg",
+      "bearman",
+      "albon",
+      "sainz",
+      "ocon",
+      "bottas",
+      "alonso"
+    ],
+    "dnfs": [
+      "stroll",
+      "perez",
+      "russell"
+    ],
+    "fastestLap": "norris",
+    "fastestPitStop": "williams"
   }
 ]
