@@ -646,5 +646,32 @@
     "fastestLap": "norris",
     "fastestPitStop": "williams",
     "driverOfTheDay": "leclerc"
+  },
+  {
+    "round": 11,
+    "qualifying": [
+      "norris",
+      "hamilton",
+      "leclerc",
+      "antonelli",
+      "piastri",
+      "verstappen",
+      "russell",
+      "hadjar",
+      "lindblad",
+      "hulkenberg",
+      "lawson",
+      "gasly",
+      "colapinto",
+      "bortoletto",
+      "ocon",
+      "alonso",
+      "bearman",
+      "sainz",
+      "albon",
+      "stroll",
+      "bottas",
+      "perez"
+    ]
   }
 ]
