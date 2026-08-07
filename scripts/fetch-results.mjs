@@ -135,11 +135,34 @@ async function fetchJSON(url, { attempts = 3 } = {}) {
       clearTimeout(timeoutId);
       if (!res.ok) {
         if (res.status === 404) return null;
+        // 429 (rate limited) — Jolpica returns Retry-After sometimes; if not,
+        // back off with much longer waits. Rate limits reset on a rolling
+        // window, so a proper pause usually clears them.
+        if (res.status === 429 && attempt < attempts) {
+          const retryAfterHeader = parseInt(res.headers.get('retry-after') || '');
+          const waitMs = Number.isFinite(retryAfterHeader) && retryAfterHeader > 0
+            ? retryAfterHeader * 1000
+            : 5000 * Math.pow(2, attempt - 1); // 5s, 10s, 20s
+          console.log(`  rate limited on ${url}, waiting ${waitMs}ms before retry ${attempt}/${attempts}`);
+          lastErr = new Error(`HTTP 429 for ${url}`);
+          await sleep(waitMs);
+          continue;
+        }
+        // Persistent 429 after retries — treat as temporary unreachability
+        // so the per-round handler preserves existing data instead of
+        // crashing the whole workflow.
+        if (res.status === 429) {
+          throw new ApiUnreachableError(url, new Error('HTTP 429 (rate limited after retries)'));
+        }
         // 5xx — server error, worth retrying
         if (res.status >= 500 && attempt < attempts) {
           lastErr = new Error(`HTTP ${res.status} for ${url}`);
           await sleep(1000 * Math.pow(3, attempt - 1));
           continue;
+        }
+        // Persistent 5xx after retries — treat as unreachable, same reason.
+        if (res.status >= 500) {
+          throw new ApiUnreachableError(url, new Error(`HTTP ${res.status}`));
         }
         throw new Error(`HTTP ${res.status} for ${url}`);
       }
@@ -319,21 +342,26 @@ async function main() {
   }
   console.log(`  Rounds to fetch: ${roundList.length}`);
 
-  // 2. Fetch each round's three sessions individually (avoids 100-row cap)
+  // 2. Fetch each round's three sessions SEQUENTIALLY (not parallel).
+  // Reason: Jolpica has a per-IP burst rate limit. With ~11 rounds × 3
+  // sessions in parallel we get 429s. Sequential + inter-request delays
+  // keeps us well under the throttle threshold.
+  //
   // Track per-round outages — if a round's whole fetch fails, the
   // preservation logic later will keep existing data on disk.
   const qualByRound = {};
   const raceByRound = {};
   const sprintByRound = {};
   const failedRounds = [];
+  const REQUEST_DELAY_MS = 400; // between individual session fetches
   for (const { round } of roundList) {
-    await sleep(150);
     try {
-      const [q, r, s] = await Promise.all([
-        fetchRoundSession(round, 'qualifying'),
-        fetchRoundSession(round, 'results'),
-        fetchRoundSession(round, 'sprint'),
-      ]);
+      const q = await fetchRoundSession(round, 'qualifying');
+      await sleep(REQUEST_DELAY_MS);
+      const r = await fetchRoundSession(round, 'results');
+      await sleep(REQUEST_DELAY_MS);
+      const s = await fetchRoundSession(round, 'sprint');
+      await sleep(REQUEST_DELAY_MS);
       if (q) qualByRound[round] = q;
       if (r) raceByRound[round] = r;
       if (s) sprintByRound[round] = s;
