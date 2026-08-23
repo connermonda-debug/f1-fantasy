@@ -729,6 +729,33 @@
       "bottas",
       "perez"
     ],
+    "race": [
+      "norris",
+      "antonelli",
+      "russell",
+      "hamilton",
+      "leclerc",
+      "piastri",
+      "lawson",
+      "hulkenberg",
+      "alonso",
+      "gasly",
+      "tsunoda",
+      "lindblad",
+      "bortoletto",
+      "colapinto",
+      "perez",
+      "sainz"
+    ],
+    "dnfs": [
+      "albon",
+      "bottas",
+      "ocon",
+      "stroll",
+      "bearman",
+      "verstappen"
+    ],
+    "fastestLap": "leclerc",
     "sprint": [
       "russell",
       "leclerc",
