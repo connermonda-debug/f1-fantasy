@@ -9,6 +9,7 @@ import { dirname, join } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const RESULTS_PATH = join(__dirname, '..', 'src', 'results.json');
+const DATA_PATH = join(__dirname, '..', 'src', 'data.js');
 const SEASON = 2026;
 const API_BASE = 'https://api.jolpi.ca/ergast/f1';
 
@@ -273,6 +274,63 @@ async function fetchRoundSession(round, session) {
   return data?.MRData?.RaceTable?.Races?.[0] || null;
 }
 
+// ── Calendar drift check ──
+// The F1 calendar changes mid-season (races cancelled, relocated, added).
+// This has happened twice already in 2026: Bahrain + Saudi were cancelled
+// pre-season, then Bahrain returned at Sepang as a new round 16.
+//
+// CALENDAR in data.js is display-only — the scoring engine never reads it,
+// so drift can't corrupt points. But it WILL show wrong race names, dates,
+// and sprint badges, so we surface it loudly in the workflow log rather
+// than waiting for someone to notice on the site.
+function checkCalendarDrift(scheduled) {
+  let js;
+  try {
+    js = readFileSync(DATA_PATH, 'utf8');
+  } catch {
+    return; // data.js unreadable — not this script's job to fail on that
+  }
+  const block = js.split('export const CALENDAR = [')[1]?.split('];')[0];
+  if (!block) return;
+
+  const local = new Map();
+  const rowRe = /round:\s*(\d+),\s*name:\s*'([^']+)',\s*location:\s*'[^']*',\s*circuit:\s*'[^']*',\s*date:\s*'([^']+)',\s*sprint:\s*(true|false)/g;
+  let m;
+  while ((m = rowRe.exec(block)) !== null) {
+    local.set(parseInt(m[1]), { name: m[2], date: m[3], sprint: m[4] === 'true' });
+  }
+
+  const drift = [];
+  for (const a of scheduled) {
+    const rd = parseInt(a.round);
+    const l = local.get(rd);
+    if (!l) {
+      drift.push(`R${rd} ${a.raceName} missing from CALENDAR`);
+      continue;
+    }
+    if (l.date !== a.date) drift.push(`R${rd} date: calendar=${l.date} api=${a.date}`);
+    if (l.sprint !== ('Sprint' in a)) drift.push(`R${rd} sprint flag differs`);
+    if (l.name !== a.raceName) drift.push(`R${rd} name: calendar="${l.name}" api="${a.raceName}"`);
+  }
+  for (const rd of local.keys()) {
+    if (!scheduled.some(a => parseInt(a.round) === rd)) {
+      drift.push(`R${rd} ${local.get(rd).name} in CALENDAR but not in API (cancelled?)`);
+    }
+  }
+
+  if (drift.length > 0) {
+    console.log('');
+    console.log('  ' + '='.repeat(64));
+    console.log('  CALENDAR DRIFT DETECTED — src/data.js needs updating');
+    console.log('  (display only; scoring is unaffected)');
+    for (const d of drift) console.log(`    - ${d}`);
+    console.log('  ' + '='.repeat(64));
+    console.log('');
+  } else {
+    console.log(`  Calendar: in sync with API (${scheduled.length} races)`);
+  }
+}
+
 // ── Discover which rounds have any data this season ──
 async function discoverRounds() {
   // The schedule endpoint tells us every round that EXISTS (whether or not it
@@ -280,6 +338,10 @@ async function discoverRounds() {
   // endpoints individually — slower but accurate, with no pagination risk.
   const seasonMeta = await fetchJSON(`${API_BASE}/${SEASON}.json?limit=100`);
   const scheduled = seasonMeta?.MRData?.RaceTable?.Races || [];
+
+  // Warn (don't fail) if the local display calendar has drifted from the API
+  checkCalendarDrift(scheduled);
+
   // Probe rounds whose race date is within the next 4 days OR has passed.
   // Sprint weekends start Friday (2 days before race), regular weekends
   // start Friday practice with Saturday qualifying. The +4 window catches
