@@ -782,5 +782,32 @@
       "hulkenberg"
     ],
     "driverOfTheDay": "norris"
+  },
+  {
+    "round": 13,
+    "qualifying": [
+      "gasly",
+      "russell",
+      "piastri",
+      "leclerc",
+      "hamilton",
+      "verstappen",
+      "antonelli",
+      "colapinto",
+      "norris",
+      "lindblad",
+      "bortoletto",
+      "bearman",
+      "hulkenberg",
+      "lawson",
+      "sainz",
+      "ocon",
+      "tsunoda",
+      "albon",
+      "bottas",
+      "perez",
+      "alonso",
+      "stroll"
+    ]
   }
 ]
