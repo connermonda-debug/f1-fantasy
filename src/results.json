@@ -373,11 +373,11 @@
     "race": [
       "antonelli",
       "hamilton",
-      "gasly",
       "hadjar",
       "piastri",
       "lawson",
       "lindblad",
+      "gasly",
       "albon",
       "ocon",
       "alonso",
@@ -808,6 +808,33 @@
       "perez",
       "alonso",
       "stroll"
-    ]
+    ],
+    "race": [
+      "antonelli",
+      "russell",
+      "verstappen",
+      "norris",
+      "piastri",
+      "hamilton",
+      "gasly",
+      "lindblad",
+      "colapinto",
+      "tsunoda",
+      "bortoletto",
+      "hulkenberg",
+      "sainz",
+      "lawson",
+      "bearman",
+      "ocon",
+      "albon",
+      "perez",
+      "bottas"
+    ],
+    "dnfs": [
+      "stroll",
+      "alonso",
+      "leclerc"
+    ],
+    "fastestLap": "antonelli"
   }
 ]
