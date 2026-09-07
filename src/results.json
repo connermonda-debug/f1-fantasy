@@ -788,26 +788,26 @@
     "qualifying": [
       "gasly",
       "russell",
-      "piastri",
       "leclerc",
       "hamilton",
       "verstappen",
-      "antonelli",
+      "piastri",
       "colapinto",
       "norris",
       "lindblad",
       "bortoletto",
       "bearman",
       "hulkenberg",
-      "lawson",
       "sainz",
       "ocon",
       "tsunoda",
-      "albon",
       "bottas",
       "perez",
+      "stroll",
+      "antonelli",
+      "albon",
       "alonso",
-      "stroll"
+      "lawson"
     ],
     "race": [
       "antonelli",
@@ -835,6 +835,7 @@
       "alonso",
       "leclerc"
     ],
-    "fastestLap": "antonelli"
+    "fastestLap": "antonelli",
+    "fastestPitStop": "sauber"
   }
 ]
