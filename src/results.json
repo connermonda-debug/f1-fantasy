@@ -838,5 +838,30 @@
     "fastestLap": "antonelli",
     "fastestPitStop": "sauber",
     "driverOfTheDay": "antonelli"
+  },
+  {
+    "round": 14,
+    "qualifying": [
+      "norris",
+      "antonelli",
+      "verstappen",
+      "hamilton",
+      "leclerc",
+      "russell",
+      "piastri",
+      "lawson",
+      "colapinto",
+      "lindblad",
+      "hulkenberg",
+      "bortoletto",
+      "ocon",
+      "gasly",
+      "tsunoda",
+      "albon",
+      "sainz",
+      "alonso",
+      "perez",
+      "bottas"
+    ]
   }
 ]
