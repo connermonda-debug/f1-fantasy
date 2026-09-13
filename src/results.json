@@ -858,10 +858,40 @@
       "gasly",
       "tsunoda",
       "albon",
-      "sainz",
       "alonso",
       "perez",
+      "bottas",
+      "sainz",
+      "stroll",
+      "bearman"
+    ],
+    "race": [
+      "antonelli",
+      "verstappen",
+      "norris",
+      "leclerc",
+      "russell",
+      "lawson",
+      "colapinto",
+      "piastri",
+      "lindblad",
+      "hulkenberg",
+      "ocon",
+      "gasly",
+      "bortoletto",
+      "tsunoda",
+      "albon",
+      "bearman",
+      "alonso",
       "bottas"
-    ]
+    ],
+    "dnfs": [
+      "sainz",
+      "perez",
+      "stroll",
+      "hamilton"
+    ],
+    "fastestLap": "russell",
+    "fastestPitStop": "mercedes"
   }
 ]
