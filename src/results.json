@@ -894,5 +894,32 @@
     "fastestLap": "russell",
     "fastestPitStop": "mercedes",
     "driverOfTheDay": "verstappen"
+  },
+  {
+    "round": 15,
+    "qualifying": [
+      "russell",
+      "leclerc",
+      "piastri",
+      "hadjar",
+      "norris",
+      "hamilton",
+      "gasly",
+      "verstappen",
+      "sainz",
+      "colapinto",
+      "bearman",
+      "lawson",
+      "albon",
+      "ocon",
+      "lindblad",
+      "antonelli",
+      "bortoletto",
+      "hulkenberg",
+      "alonso",
+      "perez",
+      "stroll",
+      "bottas"
+    ]
   }
 ]
