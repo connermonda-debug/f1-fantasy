@@ -1006,5 +1006,47 @@
     "fastestLap": "verstappen",
     "fastestPitStop": "mclaren",
     "driverOfTheDay": "verstappen"
+  },
+  {
+    "round": 17,
+    "qualifying": [
+      "verstappen",
+      "leclerc",
+      "hamilton",
+      "antonelli",
+      "norris",
+      "russell",
+      "piastri",
+      "gasly",
+      "lawson",
+      "lindblad",
+      "hulkenberg",
+      "bearman",
+      "ocon",
+      "sainz",
+      "bortoletto",
+      "colapinto",
+      "alonso",
+      "albon",
+      "stroll",
+      "perez",
+      "bottas",
+      "hadjar"
+    ],
+    "sprint": [
+      "verstappen",
+      "hamilton",
+      "leclerc",
+      "antonelli",
+      "lawson",
+      "bearman",
+      "hulkenberg",
+      "norris",
+      "gasly",
+      "ocon",
+      "alonso",
+      "sainz",
+      "lindblad"
+    ]
   }
 ]
