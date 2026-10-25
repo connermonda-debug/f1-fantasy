@@ -1077,5 +1077,32 @@
       "lindblad"
     ],
     "driverOfTheDay": "verstappen"
+  },
+  {
+    "round": 18,
+    "qualifying": [
+      "antonelli",
+      "verstappen",
+      "hadjar",
+      "leclerc",
+      "hamilton",
+      "russell",
+      "piastri",
+      "norris",
+      "lindblad",
+      "lawson",
+      "gasly",
+      "hulkenberg",
+      "bortoletto",
+      "colapinto",
+      "alonso",
+      "bearman",
+      "ocon",
+      "stroll",
+      "sainz",
+      "albon",
+      "perez",
+      "bottas"
+    ]
   }
 ]
