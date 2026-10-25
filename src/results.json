@@ -1089,20 +1089,48 @@
       "russell",
       "piastri",
       "norris",
-      "lindblad",
       "lawson",
       "gasly",
       "hulkenberg",
-      "bortoletto",
-      "colapinto",
       "alonso",
       "bearman",
+      "lindblad",
       "ocon",
-      "stroll",
       "sainz",
       "albon",
       "perez",
-      "bottas"
-    ]
+      "bottas",
+      "colapinto",
+      "bortoletto",
+      "stroll"
+    ],
+    "race": [
+      "antonelli",
+      "leclerc",
+      "verstappen",
+      "hamilton",
+      "norris",
+      "hadjar",
+      "piastri",
+      "russell",
+      "lawson",
+      "gasly",
+      "hulkenberg",
+      "lindblad",
+      "bortoletto",
+      "ocon",
+      "stroll",
+      "alonso",
+      "albon",
+      "sainz",
+      "perez"
+    ],
+    "dnfs": [
+      "bottas",
+      "colapinto",
+      "bearman"
+    ],
+    "fastestLap": "leclerc",
+    "fastestPitStop": "mclaren"
   }
 ]
