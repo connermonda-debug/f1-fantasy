@@ -1140,12 +1140,11 @@
       "hamilton",
       "russell",
       "leclerc",
-      "verstappen",
       "antonelli",
+      "verstappen",
       "norris",
       "hadjar",
       "lindblad",
-      "lawson",
       "gasly",
       "hulkenberg",
       "colapinto",
@@ -1158,7 +1157,36 @@
       "ryo_hirakawa",
       "stroll",
       "perez",
-      "bottas"
-    ]
+      "bottas",
+      "lawson"
+    ],
+    "race": [
+      "verstappen",
+      "hamilton",
+      "antonelli",
+      "leclerc",
+      "norris",
+      "russell",
+      "piastri",
+      "colapinto",
+      "lawson",
+      "gasly",
+      "bortoletto",
+      "hadjar",
+      "ryo_hirakawa",
+      "albon",
+      "sainz",
+      "hulkenberg",
+      "perez"
+    ],
+    "dnfs": [
+      "lindblad",
+      "bearman",
+      "bottas",
+      "stroll",
+      "alonso"
+    ],
+    "fastestLap": "hamilton",
+    "fastestPitStop": "rb"
   }
 ]
