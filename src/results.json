@@ -1215,6 +1215,33 @@
       "bottas",
       "perez",
       "bortoletto"
-    ]
+    ],
+    "race": [
+      "norris",
+      "verstappen",
+      "hadjar",
+      "russell",
+      "antonelli",
+      "piastri",
+      "leclerc",
+      "lawson",
+      "hamilton",
+      "hulkenberg",
+      "lindblad",
+      "alonso",
+      "colapinto",
+      "gasly",
+      "albon",
+      "bortoletto",
+      "bearman",
+      "perez",
+      "sainz",
+      "rafael_camara"
+    ],
+    "dnfs": [
+      "stroll",
+      "bottas"
+    ],
+    "fastestLap": "antonelli"
   }
 ]
