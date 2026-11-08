@@ -1189,5 +1189,32 @@
     "fastestLap": "hamilton",
     "fastestPitStop": "rb",
     "driverOfTheDay": "verstappen"
+  },
+  {
+    "round": 20,
+    "qualifying": [
+      "norris",
+      "russell",
+      "antonelli",
+      "leclerc",
+      "lawson",
+      "hulkenberg",
+      "hadjar",
+      "bearman",
+      "alonso",
+      "albon",
+      "hamilton",
+      "piastri",
+      "rafael_camara",
+      "lindblad",
+      "sainz",
+      "verstappen",
+      "colapinto",
+      "gasly",
+      "stroll",
+      "bottas",
+      "perez",
+      "bortoletto"
+    ]
   }
 ]
