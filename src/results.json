@@ -1194,27 +1194,27 @@
     "round": 20,
     "qualifying": [
       "norris",
-      "russell",
       "antonelli",
-      "leclerc",
       "lawson",
       "hulkenberg",
       "hadjar",
       "bearman",
+      "russell",
       "alonso",
       "albon",
-      "hamilton",
       "piastri",
       "rafael_camara",
-      "lindblad",
       "sainz",
-      "verstappen",
       "colapinto",
+      "leclerc",
       "gasly",
       "stroll",
       "bottas",
-      "perez",
-      "bortoletto"
+      "lindblad",
+      "bortoletto",
+      "hamilton",
+      "verstappen",
+      "perez"
     ],
     "race": [
       "norris",
@@ -1223,8 +1223,8 @@
       "russell",
       "antonelli",
       "piastri",
-      "leclerc",
       "lawson",
+      "leclerc",
       "hamilton",
       "hulkenberg",
       "lindblad",
@@ -1242,6 +1242,7 @@
       "stroll",
       "bottas"
     ],
-    "fastestLap": "antonelli"
+    "fastestLap": "antonelli",
+    "fastestPitStop": "redbull"
   }
 ]
