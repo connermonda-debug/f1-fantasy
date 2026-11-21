@@ -1244,5 +1244,32 @@
     ],
     "fastestLap": "antonelli",
     "fastestPitStop": "redbull"
+  },
+  {
+    "round": 21,
+    "qualifying": [
+      "antonelli",
+      "verstappen",
+      "russell",
+      "norris",
+      "hadjar",
+      "lindblad",
+      "piastri",
+      "lawson",
+      "gasly",
+      "colapinto",
+      "leclerc",
+      "hamilton",
+      "hulkenberg",
+      "sainz",
+      "bortoletto",
+      "albon",
+      "rafael_camara",
+      "perez",
+      "alonso",
+      "stroll",
+      "bottas",
+      "bearman"
+    ]
   }
 ]
