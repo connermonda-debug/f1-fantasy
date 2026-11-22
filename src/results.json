@@ -1248,28 +1248,57 @@
   {
     "round": 21,
     "qualifying": [
-      "antonelli",
       "verstappen",
       "russell",
       "norris",
       "hadjar",
       "lindblad",
-      "piastri",
+      "antonelli",
       "lawson",
       "gasly",
       "colapinto",
       "leclerc",
       "hamilton",
       "hulkenberg",
-      "sainz",
       "bortoletto",
       "albon",
       "rafael_camara",
       "perez",
+      "piastri",
       "alonso",
-      "stroll",
       "bottas",
+      "sainz",
+      "stroll",
       "bearman"
-    ]
+    ],
+    "race": [
+      "verstappen",
+      "norris",
+      "piastri",
+      "antonelli",
+      "gasly",
+      "colapinto",
+      "hamilton",
+      "sainz",
+      "russell",
+      "leclerc",
+      "hulkenberg",
+      "bortoletto",
+      "bearman",
+      "lawson",
+      "hadjar",
+      "rafael_camara",
+      "stroll",
+      "bottas"
+    ],
+    "dnfs": [
+      "alonso",
+      "lindblad",
+      "perez",
+      "albon"
+    ],
+    "fastestLap": "lawson",
+    "fastestPitStop": "redbull",
+    "driverOfTheDay": "verstappen"
   }
 ]
