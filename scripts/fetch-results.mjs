@@ -361,6 +361,7 @@ async function discoverRounds() {
   // has run yet). We then probe each round's qualifying/results/sprint
   // endpoints individually — slower but accurate, with no pagination risk.
   let scheduled = [];
+  let usingLocalCalendar = false;
   try {
     const seasonMeta = await fetchJSON(`${API_BASE}/${SEASON}.json?limit=100`);
     scheduled = seasonMeta?.MRData?.RaceTable?.Races || [];
@@ -378,12 +379,15 @@ async function discoverRounds() {
     console.log(`  Falling back to local CALENDAR in src/data.js (${local.size} races)`);
     scheduled = [...local.entries()].map(([round, r]) => ({
       round: String(round), raceName: r.name, date: r.date,
+      ...(r.sprint ? { Sprint: {} } : {}),
     }));
+    usingLocalCalendar = true;
   }
 
   // Warn (don't fail) if the local display calendar has drifted from the API.
-  // Skipped when we're already using the local calendar as the source.
-  checkCalendarDrift(scheduled);
+  // Meaningless when the local calendar IS the source — it would just compare
+  // data.js against itself and report noise.
+  if (!usingLocalCalendar) checkCalendarDrift(scheduled);
 
   // Probe rounds whose race date is within the next 4 days OR has passed.
   // Sprint weekends start Friday (2 days before race), regular weekends
