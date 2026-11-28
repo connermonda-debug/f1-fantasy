@@ -13,6 +13,13 @@ const DATA_PATH = join(__dirname, '..', 'src', 'data.js');
 const SEASON = 2026;
 const API_BASE = 'https://api.jolpi.ca/ergast/f1';
 
+// Jolpica sits behind Cloudflare, which blocks requests from datacenter IPs
+// (GitHub Actions) that carry Node's default User-Agent. A descriptive UA
+// identifies this as a well-behaved script. Deliberately generic — carries no
+// account, repo, or personal identifiers.
+const USER_AGENT = 'f1-fantasy-results-bot/1.0 (automated results fetcher)';
+const FETCH_HEADERS = { 'User-Agent': USER_AGENT, 'Accept': 'application/json' };
+
 // ── Driver ID mapping: Ergast driverId → local key ──
 const DRIVER_MAP = {
   max_verstappen: 'verstappen',
@@ -132,7 +139,7 @@ async function fetchJSON(url, { attempts = 3 } = {}) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30_000);
     try {
-      const res = await fetch(url, { signal: controller.signal });
+      const res = await fetch(url, { signal: controller.signal, headers: FETCH_HEADERS });
       clearTimeout(timeoutId);
       if (!res.ok) {
         if (res.status === 404) return null;
@@ -165,7 +172,18 @@ async function fetchJSON(url, { attempts = 3 } = {}) {
         if (res.status >= 500) {
           throw new ApiUnreachableError(url, new Error(`HTTP ${res.status}`));
         }
-        throw new Error(`HTTP ${res.status} for ${url}`);
+        // 403 / other 4xx — Cloudflare blocks datacenter IPs (GitHub Actions)
+        // intermittently. This is an access problem, not a data problem, so
+        // retry and then treat as unreachable rather than killing the run and
+        // emailing a failure. Existing data on disk is preserved.
+        if (attempt < attempts) {
+          const waitMs = 3000 * Math.pow(2, attempt - 1); // 3s, 6s
+          console.log(`  HTTP ${res.status} on ${url}, retry ${attempt}/${attempts} in ${waitMs}ms`);
+          lastErr = new Error(`HTTP ${res.status} for ${url}`);
+          await sleep(waitMs);
+          continue;
+        }
+        throw new ApiUnreachableError(url, new Error(`HTTP ${res.status} (blocked or refused after retries)`));
       }
       return res.json();
     } catch (err) {
@@ -283,15 +301,15 @@ async function fetchRoundSession(round, session) {
 // so drift can't corrupt points. But it WILL show wrong race names, dates,
 // and sprint badges, so we surface it loudly in the workflow log rather
 // than waiting for someone to notice on the site.
-function checkCalendarDrift(scheduled) {
+function parseLocalCalendar() {
   let js;
   try {
     js = readFileSync(DATA_PATH, 'utf8');
   } catch {
-    return; // data.js unreadable — not this script's job to fail on that
+    return null; // data.js unreadable
   }
   const block = js.split('export const CALENDAR = [')[1]?.split('];')[0];
-  if (!block) return;
+  if (!block) return null;
 
   const local = new Map();
   const rowRe = /round:\s*(\d+),\s*name:\s*'([^']+)',\s*location:\s*'[^']*',\s*circuit:\s*'[^']*',\s*date:\s*'([^']+)',\s*sprint:\s*(true|false)/g;
@@ -299,6 +317,12 @@ function checkCalendarDrift(scheduled) {
   while ((m = rowRe.exec(block)) !== null) {
     local.set(parseInt(m[1]), { name: m[2], date: m[3], sprint: m[4] === 'true' });
   }
+  return local.size > 0 ? local : null;
+}
+
+function checkCalendarDrift(scheduled) {
+  const local = parseLocalCalendar();
+  if (!local) return;
 
   const drift = [];
   for (const a of scheduled) {
@@ -336,10 +360,29 @@ async function discoverRounds() {
   // The schedule endpoint tells us every round that EXISTS (whether or not it
   // has run yet). We then probe each round's qualifying/results/sprint
   // endpoints individually — slower but accurate, with no pagination risk.
-  const seasonMeta = await fetchJSON(`${API_BASE}/${SEASON}.json?limit=100`);
-  const scheduled = seasonMeta?.MRData?.RaceTable?.Races || [];
+  let scheduled = [];
+  try {
+    const seasonMeta = await fetchJSON(`${API_BASE}/${SEASON}.json?limit=100`);
+    scheduled = seasonMeta?.MRData?.RaceTable?.Races || [];
+  } catch (err) {
+    if (!(err instanceof ApiUnreachableError)) throw err;
+    // Schedule endpoint blocked/down. We don't need it: src/data.js already
+    // holds a verified copy of the calendar. Fall back to that so a single
+    // blocked endpoint can't stop us fetching the rounds themselves.
+    console.log(`  ⚠️  Schedule endpoint unavailable (${err.message})`);
+    const local = parseLocalCalendar();
+    if (!local) {
+      console.log('  No local CALENDAR to fall back on — skipping this run.');
+      throw err;
+    }
+    console.log(`  Falling back to local CALENDAR in src/data.js (${local.size} races)`);
+    scheduled = [...local.entries()].map(([round, r]) => ({
+      round: String(round), raceName: r.name, date: r.date,
+    }));
+  }
 
-  // Warn (don't fail) if the local display calendar has drifted from the API
+  // Warn (don't fail) if the local display calendar has drifted from the API.
+  // Skipped when we're already using the local calendar as the source.
   checkCalendarDrift(scheduled);
 
   // Probe rounds whose race date is within the next 4 days OR has passed.
@@ -416,7 +459,17 @@ async function main() {
   const sprintByRound = {};
   const failedRounds = [];
   const REQUEST_DELAY_MS = 400; // between individual session fetches
+  // Circuit breaker: if the API is down, every round will fail the same way.
+  // Retrying all 23 rounds x 3 sessions x 3 attempts wastes ~15 minutes of
+  // CI time to learn what the first few failures already told us.
+  const CONSECUTIVE_FAILURE_LIMIT = 3;
+  let consecutiveFailures = 0;
   for (const { round } of roundList) {
+    if (consecutiveFailures >= CONSECUTIVE_FAILURE_LIMIT) {
+      console.log(`  Circuit breaker: ${consecutiveFailures} rounds failed in a row — API appears down.`);
+      console.log('  Stopping early; existing data is preserved and the next run will retry.');
+      break;
+    }
     try {
       const q = await fetchRoundSession(round, 'qualifying');
       await sleep(REQUEST_DELAY_MS);
@@ -427,10 +480,12 @@ async function main() {
       if (q) qualByRound[round] = q;
       if (r) raceByRound[round] = r;
       if (s) sprintByRound[round] = s;
+      consecutiveFailures = 0;
     } catch (err) {
       if (err instanceof ApiUnreachableError) {
-        console.log(`  ⚠️  R${round}: API unreachable, will preserve existing data`);
+        console.log(`  ⚠️  R${round}: API unreachable — existing data for this round is carried over`);
         failedRounds.push(round);
+        consecutiveFailures++;
         continue;
       }
       throw err;
@@ -482,7 +537,7 @@ async function main() {
   for (const r of existing) existingByRound[r.round] = r;
 
   // 6. Build results for each round
-  const results = [];
+  let results = [];
 
   for (const round of [...allRounds].sort((a, b) => a - b)) {
     const qual = qualRaces.find(r => parseInt(r.round) === round);
@@ -657,7 +712,49 @@ async function main() {
     results.push(result);
   }
 
-  // 7. Compare with existing and save if changed
+  // 7. Carry over any round that exists on disk but is absent from this run.
+  //
+  // A round whose fetch failed outright (API blocked/down) never reaches the
+  // build loop, so without this it would silently vanish from results.json —
+  // which is exactly how a transient outage could delete a completed race.
+  // Rule: the output can never contain fewer rounds than the input.
+  const builtRounds = new Set(results.map(r => r.round));
+  const carriedOver = [];
+  for (const prev of existing) {
+    if (!builtRounds.has(prev.round)) {
+      results.push(prev);
+      carriedOver.push(prev.round);
+    }
+  }
+  if (carriedOver.length > 0) {
+    console.log(`  Carried over ${carriedOver.length} round(s) not fetched this run: ${carriedOver.join(', ')}`);
+  }
+  results.sort((a, b) => a.round - b.round);
+
+  // Normalize key order. Preserved/carried-over fields get re-appended at the
+  // end of an object, so the same data can serialize two different ways. That
+  // produced meaningless diffs and defeated the "no changes" check below,
+  // committing churn on every partial outage. Fixed order => stable output.
+  const KEY_ORDER = ['round', 'qualifying', 'race', 'sprint', 'dnfs',
+                     'fastestLap', 'driverOfTheDay', 'fastestPitStop'];
+  const normalize = (r) => {
+    const out = {};
+    for (const k of KEY_ORDER) if (r[k] !== undefined) out[k] = r[k];
+    for (const k of Object.keys(r)) if (!(k in out)) out[k] = r[k]; // any extras
+    return out;
+  };
+  results = results.map(normalize);
+  existing = existing.map(normalize);
+
+  // Final safety net — refuse to write a file that loses rounds. If this ever
+  // trips, something upstream is wrong and keeping stale data beats losing it.
+  if (results.length < existing.length) {
+    console.log(`\n  ERROR: refusing to write — would drop ${existing.length - results.length} round(s).`);
+    console.log('  Keeping existing results.json untouched.');
+    return;
+  }
+
+  // 8. Compare with existing and save if changed
   const newJSON = JSON.stringify(results, null, 2);
   const oldJSON = JSON.stringify(existing, null, 2);
 
